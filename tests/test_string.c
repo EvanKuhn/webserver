@@ -107,8 +107,39 @@ static char* test_string_empty() {
   return 0;
 }
 
+static char* test_string_equal() {
+  string* a = string_new();
+  string* b = string_new();
+  mu_assert("string_equal() fails for new strings", string_equal(a, b));
+
+  string_set(a, "asdf");
+  string_set(b, "asdf");
+  mu_assert("string_equal() fails for equal strings", string_equal(a, b));
+
+  string_set(a, "foo");
+  string_set(b, "bar");
+  mu_assert("string_equal() fails for unequal strings", !string_equal(a, b));
+
+  string_set(a, "");
+  string_set(b, "");
+  mu_assert("string_equal() fails for empty strings", string_equal(a, b));
+
+  return 0;
+}
+
+static char* test_string_equal_cstr() {
+  string* a = string_new();
+  mu_assert("string_equal() fails for new strings", string_equal_cstr(a, ""));
+  string_set(a, "foo");
+  mu_assert("string_equal() fails for equal strings", string_equal_cstr(a, "foo"));
+  mu_assert("string_equal() fails for unequal strings", !string_equal_cstr(a, "bar"));
+  string_set(a, "");
+  mu_assert("string_equal() fails for empty strings", string_equal_cstr(a, ""));
+  return 0;
+}
+
 /*
-static char* test_() {
+static char* test_string_() {
   string* str = string_new();
   return 0;
 }
@@ -124,6 +155,8 @@ static char* run_all_tests() {
   mu_run_test(test_string_size);
   mu_run_test(test_string_capacity);
   mu_run_test(test_string_empty);
+  mu_run_test(test_string_equal);
+  mu_run_test(test_string_equal_cstr);
   return 0;
 }
 
