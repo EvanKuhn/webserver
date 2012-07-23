@@ -1,6 +1,7 @@
 #include "string.h"
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 //==============================================================================
 // Struct definition and private function declarations
@@ -120,6 +121,53 @@ void string_append_cstrn(string* str, const char* cstr, size_t len) {
 
 void string_append_str(string* str, string* other) {
   string_append_cstrn(str, other->buf, other->size);
+}
+
+void string_trim(string* str) {
+  string_ltrim(str);
+  string_rtrim(str);
+}
+
+void string_ltrim(string* str) {
+  // Loop until we hit a non-whitespace char
+  size_t i = 0;
+  for( ; i<str->size; ++i) {
+    if(!isspace(str->buf[i])) break;
+  }
+  // Shift the string down, over the whitespace, then pad the rest with \0
+  // - 'i' equals the number of whitespace characters up front
+  size_t newsize = str->size - i;
+  if(newsize > 0) {
+    memcpy(str->buf, str->buf + i, newsize);
+  }
+  memset(str->buf + newsize, '\0', str->cap - newsize);
+  str->size = newsize;
+}
+
+void string_rtrim(string* str) {
+  // Loop until we hit a non-whitespace char
+  size_t i = 0;
+  for(i=str->size; i>0; --i) {
+    if(!isspace(str->buf[i-1])) break;
+  }
+  // 'i' is the new size
+  string_resize(str, i);
+}
+
+void string_upcase(string* str) {
+  const char offset = 'A' - 'a';
+  for(size_t i=0; i<str->size; ++i) {
+    char c = str->buf[i];
+    if(c >= 'A' && c <= 'Z') c += offset;
+  }
+}
+
+void string_downcase(string* str) {
+  const char offset = 'a' - 'A';
+  for(size_t i=0; i<str->size; ++i) {
+    char c = str->buf[i];
+    if(c >= 'a' && c <= 'z') c += offset;
+  }
 }
 
 //==============================================================================

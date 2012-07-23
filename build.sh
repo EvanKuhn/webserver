@@ -8,9 +8,9 @@ mkdir build/tests
 
 # Build each file
 # Do we want to use -m32 -std=c99 ?
-gcc -c src/core/string.c -o build/core/string.o
-gcc -c src/core/utils.c -o build/core/utils.o
+gcc -c -std=c99 src/core/string.c -o build/core/string.o
+gcc -c -std=c99 src/core/utils.c -o build/core/utils.o
 
 # Build tests
-gcc -c tests/test_string.c -o build/tests/test_string.o -Isrc -Ilib
+gcc -c -std=c99 tests/test_string.c -o build/tests/test_string.o -Isrc -Ilib
 gcc build/tests/test_string.o build/core/string.o build/core/utils.o -o bin/run_tests

@@ -42,10 +42,10 @@ void string_append_cstrn (string* str, const char* cstr, size_t len);
 void string_append_str   (string* str, string* other);
 
 // Alterations
-void string_trim     (string* str);  // TODO
-void string_ltrim    (string* str);  // TODO
-void string_rtrim    (string* str);  // TODO
-void string_upcase   (string* str);  // TODO
-void string_downcase (string* str);  // TODO
+void string_trim     (string* str);
+void string_ltrim    (string* str);
+void string_rtrim    (string* str);
+void string_upcase   (string* str);
+void string_downcase (string* str);
 
 #endif // STRING_H

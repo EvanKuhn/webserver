@@ -1,6 +1,7 @@
 #include "core/string.h"
 #include "minunit.h"
 #include <stdio.h>
+#include <string.h>
 
 int tests_run = 0;
 
@@ -138,12 +139,75 @@ static char* test_string_equal_cstr() {
   return 0;
 }
 
-/*
-static char* test_string_() {
+static char* test_string_append_char() {
   string* str = string_new();
+  string_append_char(str, 'a');
+  mu_assert("string_append() fails for new string", string_equal_cstr(str, "a"));
+  string_append_char(str, 'b');
+  mu_assert("string_append() fails", string_equal_cstr(str, "ab"));
   return 0;
 }
-*/
+
+static char* test_string_append_cstr() {
+  string* str = string_new();
+  string_append_cstr(str, "hello");
+  mu_assert("string_append_cstr() fails for new string", string_equal_cstr(str, "hello"));
+  string_append_cstr(str, " world");
+  mu_assert("string_append_cstr() fails", string_equal_cstr(str, "hello world"));
+  return 0;
+}
+
+static char* test_string_append_cstrn() {
+  string* str = string_new();
+  string_append_cstrn(str, "hello", 5);
+  mu_assert("string_append_cstrn() fails for new string", string_equal_cstr(str, "hello"));
+  string_append_cstrn(str, " world", 6);
+  mu_assert("string_append_cstrn() fails", string_equal_cstr(str, "hello world"));
+  string_append_cstrn(str, "!!!!!", 2);
+  mu_assert("string_append_cstrn() fails when cstr is longer", string_equal_cstr(str, "hello world!!"));
+  return 0;
+}
+
+static char* test_string_append_str() {
+  string* str = string_new();
+  string* suffix = string_new();
+  string_set(suffix, "hello");
+  string_append_str(str, suffix);
+  mu_assert("string_append_str() fails for new string", string_equal_cstr(str, "hello"));
+  string_append_str(str, suffix);
+  mu_assert("string_append_str() fails", string_equal_cstr(str, "hellohello"));
+  return 0;
+}
+
+static char* test_string_trim() {
+  string* str = string_new();
+  //TODO
+  return 0;
+}
+
+static char* test_string_ltrim() {
+  string* str = string_new();
+  //TODO
+  return 0;
+}
+
+static char* test_string_rtrim() {
+  string* str = string_new();
+  //TODO
+  return 0;
+}
+
+static char* test_string_upcase() {
+  string* str = string_new();
+  //TODO
+  return 0;
+}
+
+static char* test_string_downcase() {
+  string* str = string_new();
+  //TODO
+  return 0;
+}
 
 static char* run_all_tests() {
   mu_run_test(test_new_creates_empty_string);
@@ -157,6 +221,15 @@ static char* run_all_tests() {
   mu_run_test(test_string_empty);
   mu_run_test(test_string_equal);
   mu_run_test(test_string_equal_cstr);
+  mu_run_test(test_string_append_char);
+  mu_run_test(test_string_append_cstr);
+  mu_run_test(test_string_append_cstrn);
+  mu_run_test(test_string_append_str);
+  mu_run_test(test_string_trim);
+  mu_run_test(test_string_ltrim);
+  mu_run_test(test_string_rtrim);
+  mu_run_test(test_string_upcase);
+  mu_run_test(test_string_downcase);
   return 0;
 }
 
