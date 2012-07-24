@@ -199,13 +199,27 @@ static char* test_string_rtrim() {
 
 static char* test_string_upcase() {
   string* str = string_new();
-  //TODO
+  string_upcase(str);
+  mu_assert("string_upcase() fails for new string", string_equal_cstr(str, ""));
+  string_set(str, "fooBAR");
+  string_upcase(str);
+  mu_assert("string_upcase() fails for letters", string_equal_cstr(str, "FOOBAR"));
+  string_set(str, "!@#$%^&*()1234567890");
+  string_upcase(str);
+  mu_assert("string_upcase() fails for non-letters", string_equal_cstr(str, "!@#$%^&*()1234567890"));
   return 0;
 }
 
 static char* test_string_downcase() {
   string* str = string_new();
-  //TODO
+  string_downcase(str);
+  mu_assert("string_downcase() fails for new string", string_equal_cstr(str, ""));
+  string_set(str, "fooBAR");
+  string_downcase(str);
+  mu_assert("string_downcase() fails for letters", string_equal_cstr(str, "foobar"));
+  string_set(str, "!@#$%^&*()1234567890");
+  string_downcase(str);
+  mu_assert("string_downcase() fails for non-letters", string_equal_cstr(str, "!@#$%^&*()1234567890"));
   return 0;
 }
 

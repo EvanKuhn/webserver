@@ -1,2 +1,8 @@
 This is my own super-simple web server, for hacking and learning.
+It also contains a bunch of other random stuff.
+
+TODO:
+- Finish C string library
+- C vector library
+- C hash library
 

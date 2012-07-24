@@ -13,6 +13,7 @@ struct string {
 };
 
 // Increase the string's buffer size by at least 'len' chars
+// TODO: make this set the capacity to at least 'len', rather than adding 'len' chars
 void string_grow_capacity(string* str, size_t len);
 
 //==============================================================================
@@ -158,7 +159,7 @@ void string_upcase(string* str) {
   const char offset = 'A' - 'a';
   for(size_t i=0; i<str->size; ++i) {
     char c = str->buf[i];
-    if(c >= 'A' && c <= 'Z') c += offset;
+    if(c >= 'a' && c <= 'z') str->buf[i] += offset;
   }
 }
 
@@ -166,7 +167,7 @@ void string_downcase(string* str) {
   const char offset = 'a' - 'A';
   for(size_t i=0; i<str->size; ++i) {
     char c = str->buf[i];
-    if(c >= 'a' && c <= 'z') c += offset;
+    if(c >= 'A' && c <= 'Z') str->buf[i] += offset;
   }
 }
 
