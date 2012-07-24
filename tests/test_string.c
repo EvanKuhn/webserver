@@ -181,19 +181,19 @@ static char* test_string_append_str() {
 
 static char* test_string_trim() {
   string* str = string_new();
-  //TODO
+  string_clear(str); //TODO
   return 0;
 }
 
 static char* test_string_ltrim() {
   string* str = string_new();
-  //TODO
+  string_clear(str); //TODO
   return 0;
 }
 
 static char* test_string_rtrim() {
   string* str = string_new();
-  //TODO
+  string_clear(str); //TODO
   return 0;
 }
 
