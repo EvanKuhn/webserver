@@ -4,6 +4,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>   # inet_addr
 
+int SERVER_PORT = 80;
+
 int main(int argc, char** argv) {
   int socket_desc = -1;
   struct sockaddr_in server;
@@ -17,7 +19,7 @@ int main(int argc, char** argv) {
 
   // Set up the address to connect to (host, port, type)
   server.sin_addr.s_addr = inet_addr("127.0.0.1");
-  server.sin_port = htons(80);
+  server.sin_port = htons(SERVER_PORT);
   server.sin_family = AF_INET;
 
   // Connect to remote server
@@ -47,7 +49,7 @@ int main(int argc, char** argv) {
   puts(server_reply);
   puts("----------------------------------");
 
-  // Close the socket and exit  
+  // Close the socket and exit
   if(socket_desc != -1) close(socket_desc);
   return 0;
 return_failure:

@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 
+int SERVER_PORT = 80;
+
 int main(int argc, char** argv) {
   printf("Initializing\n");
   int result = 0;
@@ -18,11 +20,11 @@ int main(int argc, char** argv) {
   // Initialize the socket description
   server_addr.sin_family = AF_INET;
   server_addr.sin_addr.s_addr = INADDR_ANY;
-  server_addr.sin_port = htons(7000);
+  server_addr.sin_port = htons(SERVER_PORT);
 
   // bind the socket to the port specified above
-  result = bind(server_socket, 
-                (struct sockaddr*)&server_addr, 
+  result = bind(server_socket,
+                (struct sockaddr*)&server_addr,
                 sizeof(server_addr));
   if(result == -1) {
     perror("Unable to bind socket");
@@ -39,15 +41,15 @@ int main(int argc, char** argv) {
   // Accept incoming connections
   printf("Listening on port %i\n", ntohs(server_addr.sin_port));
   struct sockaddr_in client_addr;
-  int client_len = sizeof(client_addr);
-  int client_socket = accept(server_socket, 
-                             (struct sockaddr*)&client_addr, 
+  socklen_t client_len = sizeof(client_addr);
+  int client_socket = accept(server_socket,
+                             (struct sockaddr*)&client_addr,
                              &client_len);
   if(client_socket == -1) {
     perror("Unable to accept client socket\n");
     return 1;
   }
-  printf("Got client socket on port %i", ntohs(client_addr.sin_port)); 
+  printf("Got client socket on port %i", ntohs(client_addr.sin_port));
 
   // Read data from the socket
   char data[2048] = {0};
