@@ -1,15 +1,29 @@
 #include <stdio.h>
-#include <string.h>      # strlen
-#include <unistd.h>      # close
-#include <sys/socket.h>
-#include <arpa/inet.h>   # inet_addr
+#include <stdlib.h>
+#include <string.h>
 #include "program_options.h"
 
+const char* usage() {
+  return
+  "\n"
+  "OPTIONS:\n"
+  "  -p <port>    Set the port to listen on\n"
+  "  -h           Show this help message\n"
+  "\n"
+  ;
+}
 
 int main(int argc, char** argv) {
   // Get options
   ProgramOptions options;
-  parse_options(argc, argv, &options);
+  if(!parse_options(argc, argv, &options)) {
+    fprintf(stderr, "%s", usage());
+    exit(1);
+  }
+  if(options.help) {
+    printf("%s", usage());
+    exit(0);
+  }
 
   // Print options
   printf("Options\n");

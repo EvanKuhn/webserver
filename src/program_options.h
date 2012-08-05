@@ -5,6 +5,7 @@
 
 typedef struct {
   int port;
+  bool help;
 } ProgramOptions;
 
 bool parse_options(int argc, char** argv, ProgramOptions* options);

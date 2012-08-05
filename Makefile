@@ -13,7 +13,7 @@ src/main.o: src/main.c src/program_options.h src/program_options.c
 tests/run_tests.o: $(SOURCES) $(TESTS)
 
 # Executables
-bin/webserver: src/webserver.o
+bin/webserver: $(OBJECTS) src/webserver.o
 	$(CC) $(OBJECTS) src/webserver.o -o bin/webserver
 
 bin/run_tests: $(OBJECTS) tests/run_tests.o

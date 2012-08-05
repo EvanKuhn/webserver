@@ -11,7 +11,8 @@ int main(int argc, char **argv) {
   if(!msg) msg = test_program_options();
 
   // Print results
-  printf("%s\n", (msg ? msg : "ALL TESTS PASSED"));
+  if(msg) printf("\nTEST FAILED: %s\n", msg);
+  else    printf("\nALL TESTS PASSED\n");
   printf("Tests run: %d\n", tests_run);
 
   // Exit with success or failure
