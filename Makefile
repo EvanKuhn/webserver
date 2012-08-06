@@ -1,15 +1,18 @@
 SHELL   = /bin/sh
 CC      = gcc
 CFLAGS  = -c -std=c99 -Wall -Isrc -Ilib
-SOURCES = src/program_options.c src/webserver.c
+SOURCES = src/program_options.c src/webserver.c src/sockets.c
 OBJECTS = $(SOURCES:.c=.o)
-TESTS   = tests/test_program_options.h
+TESTS   = tests/test_program_options.h tests/test_sockets.h
 
 all: $(OBJECTS) test bin/webserver
 test: $(OBJECTS) bin/run_tests
 
 # Object file dependencies
-src/main.o: src/main.c src/program_options.h src/program_options.c
+src/program_options.o: src/program_options.h
+src/sockets.o: src/sockets.h
+src/webserver.o: src/webserver.h
+src/webserver_main.o: src/webserver_main.c src/program_options.h src/webserver.h
 tests/run_tests.o: $(SOURCES) $(TESTS)
 
 # Executables

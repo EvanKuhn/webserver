@@ -2,30 +2,12 @@
 #define SOCKETS_H
 
 #include <stdbool.h>
-
-//==============================================================================
-// ServerSocket
-//==============================================================================
-typdef struct {
-  int port;
-} ServerSocket;
-
-// Initialize the socket
-bool server_socket_init(ServerSocket* s);
-
-// Bind the socket to a port
-bool server_socket_bind(ServerSocket* s, int port);
-
-// Listen for an incoming connection
-bool server_socket_listen(ServerSocket* s);
-
-// Accept an incoming connection and initialize the ClientSocket.
-bool server_socket_accept(ServerSocket* s, ClientSocket* c);
+#include <string.h>
 
 //==============================================================================
 // ClientSocket
 //==============================================================================
-typdef struct {
+typedef struct {
   char* data;
   size_t data_len;
 } ClientSocket;
@@ -42,5 +24,24 @@ bool server_socket_recv(ClientSocket* s);
 // Close the socket and clean up any allocated resource, like data, within the
 // ClientSocket struct.
 bool server_socket_close(ClientSocket* s);
+
+//==============================================================================
+// ServerSocket
+//==============================================================================
+typedef struct {
+  int port;
+} ServerSocket;
+
+// Initialize the socket
+bool server_socket_init(ServerSocket* s);
+
+// Bind the socket to a port
+bool server_socket_bind(ServerSocket* s, int port);
+
+// Listen for an incoming connection
+bool server_socket_listen(ServerSocket* s);
+
+// Accept an incoming connection and initialize the ClientSocket.
+bool server_socket_accept(ServerSocket* s, ClientSocket* c);
 
 #endif // SOCKETS_H

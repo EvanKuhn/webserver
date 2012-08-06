@@ -1,7 +1,9 @@
-This is my own super-simple web server, for hacking and learning.
-It also contains a bunch of other random stuff.
+My own super-simple webserver implementation, for learning. Written in C.
 
-TODO:
-- Finish C string library
-- C vector library
-- C hash library
+Utilizes:
+- C
+- C socket programming
+- MinUnit (C unit-testing framework)
+- Ruby, Rake, RSpec
+- HTTP
+- libevent?
