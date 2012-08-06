@@ -1,20 +1,23 @@
 require 'socket'
 
+TEST_PORT = 8000
+
 describe :webserver do
   before :all do
     # Spin up the server
-    #p = IO.popen('./bin/webserver')
-    #@pid = p.pid
+    p = IO.popen("./bin/webserver -p #{TEST_PORT}")
+    @pid = p.pid
+    puts "Server running, pid = #@pid\n"
   end
 
   after :all do
     # Kill the server
-    #Process.kill('TERM', @pid)
+    Process.kill('TERM', @pid)
   end
 
-  it 'accepts connections on port 80' do
+  it 'accepts connections' do
     expect do
-     s = TCPSocket.open('localhost', 80)
+     s = TCPSocket.open('localhost', TEST_PORT)
      s.should_not be_nil
      s.close
    end .should_not raise_error

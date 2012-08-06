@@ -1,7 +1,7 @@
 SHELL   = /bin/sh
 CC      = gcc
 CFLAGS  = -c -std=c99 -Wall -Isrc -Ilib
-SOURCES = src/program_options.c
+SOURCES = src/program_options.c src/webserver.c
 OBJECTS = $(SOURCES:.c=.o)
 TESTS   = tests/test_program_options.h
 
@@ -13,8 +13,8 @@ src/main.o: src/main.c src/program_options.h src/program_options.c
 tests/run_tests.o: $(SOURCES) $(TESTS)
 
 # Executables
-bin/webserver: $(OBJECTS) src/webserver.o
-	$(CC) $(OBJECTS) src/webserver.o -o bin/webserver
+bin/webserver: $(OBJECTS) src/webserver_main.o
+	$(CC) $(OBJECTS) src/webserver_main.o -o bin/webserver
 
 bin/run_tests: $(OBJECTS) tests/run_tests.o
 	[ -e bin ] || mkdir bin
