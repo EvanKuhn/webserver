@@ -6,11 +6,9 @@
 
 void start_server(int port) {
   printf("starting server on port %i\n", port);
+  int result = 0;
 
   printf("Initializing\n");
-  int result = 0;
-  struct sockaddr_in server_addr;
-  memset(&server_addr, 0, sizeof(server_addr));
 
   int server_socket = socket(AF_INET, SOCK_STREAM, 0);
   if(server_socket == -1) {
@@ -19,6 +17,9 @@ void start_server(int port) {
   }
 
   // Initialize the socket description
+  struct sockaddr_in server_addr;
+  memset(&server_addr, 0, sizeof(server_addr));
+
   server_addr.sin_family = AF_INET;
   server_addr.sin_addr.s_addr = INADDR_ANY;
   server_addr.sin_port = htons(port);
@@ -42,10 +43,9 @@ void start_server(int port) {
     // Accept incoming connections
     printf("Listening on port %i\n", ntohs(server_addr.sin_port));
     struct sockaddr_in client_addr;
-    socklen_t client_len = sizeof(client_addr);
     int client_socket = accept(server_socket,
                                (struct sockaddr*)&client_addr,
-                               &client_len);
+                               sizeof(client_addr));
     if(client_socket == -1) {
       perror("Unable to accept client socket\n");
     }

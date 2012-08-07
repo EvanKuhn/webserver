@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+bool silence_parse_options = false;
+
 bool parse_options(int argc, char** argv, ProgramOptions* options) {
   // Tell getopt() not to print error messages
   opterr = 0;
@@ -26,12 +28,17 @@ bool parse_options(int argc, char** argv, ProgramOptions* options) {
       options->port = atoi(optarg);
       break;
     case '?':
-      if(optopt == 'p')
-        fprintf(stderr, "ERROR: Option -p requires an argument\n");
-      else if(isprint(optopt))
-        fprintf(stderr, "ERROR: Unknown option '-%c'\n", optopt);
-      else
-        fprintf(stderr, "ERROR: Unknown option character '\\x%x'\n", optopt);
+      if(!silence_parse_options) {
+        if(optopt == 'p') {
+          fprintf(stderr, "ERROR: Option -p requires an argument\n");
+        }
+        else if(isprint(optopt)) {
+          fprintf(stderr, "ERROR: Unknown option '-%c'\n", optopt);
+        }
+        else {
+          fprintf(stderr, "ERROR: Unknown option character '\\x%x'\n", optopt);
+        }
+      }
       return false;
     }
   }

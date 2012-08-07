@@ -10,8 +10,8 @@ static char* program_options_sets_defaults() {
   int argc = 1;
   char* argv[1] = { "webserver" };
   bool status = parse_options(argc, argv, &options);
-  mu_assert("parse_options() should succeed given no args", status);
-  mu_assert("parse_options() didn't set default port", options.port == 80);
+  mu_assert("should succeed given no args", status);
+  mu_assert("didn't set default port", options.port == 80);
   return 0;
 }
 
@@ -21,8 +21,8 @@ static char* program_options_parses_port() {
   int argc = 3;
   char* argv[3] = { "webserver", "-p", "1234" };
   bool status = parse_options(argc, argv, &options);
-  mu_assert("parse_options() should succeed given a port", status);
-  mu_assert("parse_options() didn't parse port", options.port == 1234);
+  mu_assert("should succeed given a port", status);
+  mu_assert("didn't parse port", options.port == 1234);
   return 0;
 }
 
@@ -32,7 +32,7 @@ static char* program_options_requires_port_arg() {
   int argc = 2;
   char* argv[2] = { "webserver", "-p" };
   bool status = parse_options(argc, argv, &options);
-  mu_assert("parse_options() should fail if not given port arg", status == false);
+  mu_assert("should fail if not given port arg", status == false);
   return 0;
 }
 
@@ -42,12 +42,13 @@ static char* program_options_supports_help() {
   int argc = 2;
   char* argv[2] = { "webserver", "-h" };
   bool status = parse_options(argc, argv, &options);
-  mu_assert("parse_options() should accept -h", status);
-  mu_assert("parse_options() should set help flag to true", options.help);
+  mu_assert("should accept -h", status);
+  mu_assert("should set help flag to true", options.help);
   return 0;
 }
 
 char* test_program_options() {
+  silence_parse_options = true;
   char* msg = NULL;
   mu_run_test(program_options_sets_defaults);
   mu_run_test(program_options_parses_port);
