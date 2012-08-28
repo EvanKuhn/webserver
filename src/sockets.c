@@ -31,8 +31,11 @@ bool client_socket_recv(ClientSocket* s) {
 // Close the socket and clean up any allocated resource, like data, within the
 // ClientSocket struct.
 bool client_socket_close(ClientSocket* s) {
-  //TODO: delete data
   const int result = close(s->fd);
+  if(s->data && s->data_len > 0) {
+    free(s->data, s->data_len); // TODO
+  }
+  client_socket_init(s); // Reset data members
   return (result != -1);
 }
 
@@ -43,7 +46,7 @@ bool server_socket_init(ServerSocket* s) {
   // Start from invalid/zero values
   s->fd = -1;
   memset(&s->addr, 0, sizeof(s->addr));
-  s->blocking = true;
+  s->blocking = true; // TODO - how do we let the user set this?
 
   // Create the socket
   s->fd = socket(AF_INET, SOCK_STREAM, 0);

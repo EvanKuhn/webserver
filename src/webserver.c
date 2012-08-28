@@ -38,6 +38,7 @@ void start_server(int port) {
     result = listen(server_socket, 5);
     if(result == -1) {
       perror("Socket unable to listen");
+      break;
     }
 
     // Accept incoming connections
@@ -48,6 +49,7 @@ void start_server(int port) {
                                sizeof(client_addr));
     if(client_socket == -1) {
       perror("Unable to accept client socket\n");
+      break;
     }
     printf("Got client socket on port %i\n", ntohs(client_addr.sin_port));
 
@@ -55,12 +57,14 @@ void start_server(int port) {
     char data[2048] = {0};
     if(recv(client_socket, data, 2048, 0) < 0) {
       perror("Error getting data from socket");
+      break;
     }
     printf("Got data: %s\n", data);
 
     // Echo the data back
     if(send(client_socket, data, strlen(data), 0) < 0) {
       perror("Error sending data back to client");
+      break;
     }
     printf("Echoed data back to client\n");
 

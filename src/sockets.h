@@ -39,7 +39,7 @@ bool client_socket_close(ClientSocket* s);
 struct ServerSocket {
   int                fd;       // File descriptor
   struct sockaddr_in addr;     // Address
-  bool               blocking; // Cause calls to server_socket_accept() to block
+  bool               blocking; // Causes server_socket_accept() to block
 };
 typedef struct ServerSocket ServerSocket;
 
