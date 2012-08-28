@@ -1,9 +1,12 @@
 #include "sockets.h"
+#include <arpa/inet.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <fcntl.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 //==============================================================================
 // ClientSocket
@@ -15,9 +18,26 @@ void client_socket_init(ClientSocket* s) {
   s->data_len = 0;
 }
 
+bool client_socket_connect(ClientSocket* s, const char* ip, int port) {
+  // Make sure the socket isn't already open
+  if(s->fd != -1) return false;
+
+  // Create the socket
+  s->fd = socket(AF_INET, SOCK_STREAM, 0);
+
+  // Set up the address and connect to it
+  memset(&s->addr, 0, sizeof(s->addr));
+  s->addr.sin_family = AF_INET;
+  s->addr.sin_addr.s_addr = inet_addr(ip);
+  s->addr.sin_port = htons(port);
+  int result = connect(s->fd, (struct sockaddr*)&s->addr, sizeof(s->addr));
+  return (result != -1);
+}
+
 // Send data over the client socket
 bool client_socket_send(ClientSocket* s, void* buf, size_t bufsize) {
-  return true; //TODO
+  int result = send(s->fd, buf, bufsize, 0);
+  return (result != -1);
 }
 
 // Receive data from the socket.
@@ -28,13 +48,9 @@ bool client_socket_recv(ClientSocket* s) {
   return true; //TODO
 }
 
-// Close the socket and clean up any allocated resource, like data, within the
-// ClientSocket struct.
 bool client_socket_close(ClientSocket* s) {
   const int result = close(s->fd);
-  if(s->data && s->data_len > 0) {
-    free(s->data, s->data_len); // TODO
-  }
+  if(s->data && s->data_len > 0) free(s->data);
   client_socket_init(s); // Reset data members
   return (result != -1);
 }
@@ -46,7 +62,7 @@ bool server_socket_init(ServerSocket* s) {
   // Start from invalid/zero values
   s->fd = -1;
   memset(&s->addr, 0, sizeof(s->addr));
-  s->blocking = true; // TODO - how do we let the user set this?
+  s->blocking = true;
 
   // Create the socket
   s->fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -56,13 +72,17 @@ bool server_socket_init(ServerSocket* s) {
   s->addr.sin_family = AF_INET;
   s->addr.sin_addr.s_addr = INADDR_ANY;
 
-  // Set blocking
+  // Enable blocking IO
+  server_socket_set_blocking(s, s->blocking);
+  return true;
+}
+
+bool server_socket_set_blocking(ServerSocket* s, bool blocking) {
+  s->blocking = blocking;
   int flags = fcntl(s->fd, F_GETFL, 0);
   if(flags == -1) return false;
   flags = (s->blocking ? flags & (~O_NONBLOCK) : flags | O_NONBLOCK);
-  fcntl(s->fd, F_SETFL, flags);
-
-  return true;
+  return fcntl(s->fd, F_SETFL, flags) != -1;
 }
 
 bool server_socket_bind(ServerSocket* s, int port) {
@@ -78,7 +98,8 @@ bool server_socket_listen(ServerSocket* s, int max_pending) {
 }
 
 bool server_socket_accept(ServerSocket* s, ClientSocket* c) {
-  c->fd = accept(s->fd, &c->addr, sizeof(c->addr));
+  socklen_t client_len = sizeof(c->addr);
+  c->fd = accept(s->fd, (struct sockaddr*)&c->addr, &client_len);
   return (c->fd != -1);
 }
 

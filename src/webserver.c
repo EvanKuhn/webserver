@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 
 void start_server(int port) {
   printf("starting server on port %i\n", port);
@@ -44,9 +45,10 @@ void start_server(int port) {
     // Accept incoming connections
     printf("Listening on port %i\n", ntohs(server_addr.sin_port));
     struct sockaddr_in client_addr;
+    socklen_t client_len = sizeof(client_addr);
     int client_socket = accept(server_socket,
                                (struct sockaddr*)&client_addr,
-                               sizeof(client_addr));
+                               &client_len);
     if(client_socket == -1) {
       perror("Unable to accept client socket\n");
       break;

@@ -20,6 +20,9 @@ typedef struct ClientSocket ClientSocket;
 // Initialize the socket
 void client_socket_init(ClientSocket* s);
 
+// Connect to a server listening on the given IP address and port
+bool client_socket_connect(ClientSocket* s, const char* ip, int port);
+
 // Send data over the client socket
 bool client_socket_send(ClientSocket* s, void* buf, size_t bufsize);
 
@@ -46,6 +49,11 @@ typedef struct ServerSocket ServerSocket;
 // Initialize the socket
 bool server_socket_init(ServerSocket* s);
 
+// Enable or disable blocking IO for the socket.
+// - Blocking IO enabled by default.
+// - Must be called before
+bool server_socket_set_blocking(ServerSocket* s, bool blocking);
+
 // Bind the socket to a port
 bool server_socket_bind(ServerSocket* s, int port);
 
@@ -53,6 +61,9 @@ bool server_socket_bind(ServerSocket* s, int port);
 bool server_socket_listen(ServerSocket* s, int max_pending);
 
 // Accept an incoming connection and initialize the ClientSocket.
+// - If socket is non-blocking and this function returns false, check if
+//   errno equals EWOULDBLOCK. If so, it's not an error, but rather there are
+//   no pending connections.
 bool server_socket_accept(ServerSocket* s, ClientSocket* c);
 
 // Close a server socket
