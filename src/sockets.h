@@ -34,6 +34,8 @@ bool client_socket_recv(ClientSocket* s);
 
 // Close the socket and clean up any allocated resource, like data, within the
 // ClientSocket struct.
+// - Will always clean up data, even if it fails to close the socket.
+// - If succesful, sets file descriptor to -1
 bool client_socket_close(ClientSocket* s);
 
 //==============================================================================
@@ -67,6 +69,7 @@ bool server_socket_listen(ServerSocket* s, int max_pending);
 bool server_socket_accept(ServerSocket* s, ClientSocket* c);
 
 // Close a server socket
+// - If successful, sets file descriptor to -1
 bool server_socket_close(ServerSocket* s);
 
 #endif // SOCKETS_H

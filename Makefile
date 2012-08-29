@@ -1,6 +1,6 @@
 SHELL   = /bin/sh
 CC      = gcc
-CFLAGS  = -c -std=c99 -Wall -Isrc -Ilib
+CFLAGS  = -c -std=c99 -Wall -Isrc -Ilib -Werror
 SOURCES = src/program_options.c src/webserver.c src/sockets.c
 OBJECTS = $(SOURCES:.c=.o)
 TESTS   = tests/test_program_options.h tests/test_sockets.h

@@ -30,8 +30,12 @@ bool client_socket_connect(ClientSocket* s, const char* ip, int port) {
   s->addr.sin_family = AF_INET;
   s->addr.sin_addr.s_addr = inet_addr(ip);
   s->addr.sin_port = htons(port);
-  int result = connect(s->fd, (struct sockaddr*)&s->addr, sizeof(s->addr));
-  return (result != -1);
+  const int result = connect(s->fd, (struct sockaddr*)&s->addr, sizeof(s->addr));
+  const bool status = (result != -1);
+
+  // If we failed, reinitialize the socket
+  if(!status) client_socket_init(s);
+  return status;
 }
 
 // Send data over the client socket
@@ -50,9 +54,16 @@ bool client_socket_recv(ClientSocket* s) {
 
 bool client_socket_close(ClientSocket* s) {
   const int result = close(s->fd);
-  if(s->data && s->data_len > 0) free(s->data);
-  client_socket_init(s); // Reset data members
-  return (result != -1);
+  const bool status = (result != -1);
+  if(s->data && s->data_len > 0) {
+    free(s->data);
+    s->data = 0;
+    s->data_len = 0;
+  }
+  if(status) {
+    s->fd = -1;
+  }
+  return status;
 }
 
 //==============================================================================
@@ -105,5 +116,7 @@ bool server_socket_accept(ServerSocket* s, ClientSocket* c) {
 
 bool server_socket_close(ServerSocket* s) {
   const int result = close(s->fd);
-  return (result != -1);
+  const bool status = (result != -1);
+  if(status) s->fd = -1;
+  return status;
 }
