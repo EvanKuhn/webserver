@@ -64,19 +64,27 @@ static char* client_socket_connect_test() {
 
 static char* client_socket_send_test() {
   puts("client_socket_send_test");
-  printf("- not implemented\n"); //TODO
+  printf("- not implemented\n");
+  //TODO
+  // Sending on a closed connection should fail
+  // Fork and send to a subprocess, make sure if succeeds
   return 0;
 }
 
 static char* client_socket_recv_test() {
   puts("client_socket_recv_test");
-  printf("- not implemented\n"); //TODO
+  printf("- not implemented\n");
+  //TODO
+  // Receiving on a closed connection should fail
+  // Fork and recv from a subprocess, make sure if succeeds
+
   return 0;
 }
 
 static char* client_socket_close_test() {
   puts("client_socket_close_test");
-  printf("- not implemented\n"); //TODO
+  printf("- not implemented\n");
+  //TODO
   // Test with uninitialized socket
   // Test with initialized socket
   // Make sure file descriptor is set to -1

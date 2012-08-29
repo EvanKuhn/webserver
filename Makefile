@@ -5,8 +5,7 @@ SOURCES = src/program_options.c src/webserver.c src/sockets.c
 OBJECTS = $(SOURCES:.c=.o)
 TESTS   = tests/test_program_options.h tests/test_sockets.h
 
-all: $(OBJECTS) test bin/webserver
-test: $(OBJECTS) bin/run_tests
+all: $(OBJECTS) bin/webserver bin/run_tests
 
 # Object file dependencies
 src/program_options.o: src/program_options.h
@@ -17,9 +16,13 @@ tests/run_tests.o: $(SOURCES) $(TESTS)
 
 # Executables
 bin/webserver: $(OBJECTS) src/webserver_main.o
+	#
+	#===== Building bin/webserver =====
 	$(CC) $(OBJECTS) src/webserver_main.o -o bin/webserver
 
 bin/run_tests: $(OBJECTS) tests/run_tests.o
+	#
+	#===== Building bin/run_tests =====
 	[ -e bin ] || mkdir bin
 	$(CC) $(OBJECTS) tests/run_tests.o -o bin/run_tests
 
