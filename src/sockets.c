@@ -49,7 +49,7 @@ bool client_socket_send(ClientSocket* s, void* buf, size_t bufsize) {
 // - Data array size will be written to ClientSocket::data_len.
 // - Any existing data array will be deleted.
 bool client_socket_recv(ClientSocket* s) {
-  return true; //TODO
+  return false; //TODO
 }
 
 bool client_socket_close(ClientSocket* s) {

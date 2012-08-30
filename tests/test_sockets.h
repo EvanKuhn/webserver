@@ -8,6 +8,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+// We'll reserve port 8000 for tests that don't fork. For those that do, use
+// 8001 and greater. This function will return such a port number and increment
+// the number returned each time it is called.
+int get_next_port() {
+  static int port = 8000;
+  return ++port;
+}
+
 //==============================================================================
 // ClientSocket
 //==============================================================================
@@ -26,7 +34,7 @@ static char* client_socket_connect_test() {
 
   // Use a different port in this test, because we're going to spawn a subprocess
   // that'll stick around for a while and use that port.
-  const int port = 8001;
+  const int port = get_next_port();
   bool result = false;
 
   ClientSocket s;
@@ -43,7 +51,7 @@ static char* client_socket_connect_test() {
     perror("Unable to fork during testing");
     mu_assert("should fork successfully during testing", false);
   }
-  if(pid == 0) {
+  else if(pid == 0) {
     // Child process: open a server socket
     ServerSocket server;
     server_socket_init(&server);
@@ -59,25 +67,91 @@ static char* client_socket_connect_test() {
     mu_assert("failed to connect to server socket", result);
   }
 
+  client_socket_close(&s);
   return 0;
 }
 
 static char* client_socket_send_test() {
   puts("client_socket_send_test");
-  printf("- not implemented\n");
-  //TODO
-  // Sending on a closed connection should fail
-  // Fork and send to a subprocess, make sure if succeeds
+  const int port = get_next_port();
+  bool result = false;
+
+  ClientSocket s;
+  client_socket_init(&s);
+
+  result = client_socket_send(&s, "asdf", 4);
+  mu_assert("sending over an unconnected socket shouldn't succeed", !result);
+
+  // Test sending by forking a server process and sending to it
+  pid_t pid = fork();
+  if(pid < 0) {
+    perror("Unable to fork during testing");
+    mu_assert("should fork successfully during testing", false);
+  }
+  else if(pid == 0) {
+    // Child process: open a server socket
+    ServerSocket server;
+    server_socket_init(&server);
+    server_socket_bind(&server, port);
+    server_socket_listen(&server, 5);
+    sleep(2); // Wait for client to connect
+    exit(0);
+  }
+  else {
+    // Parent process: open connection to server
+    usleep(250 * 1000); // Wait a bit for server socket to listen
+    result = client_socket_connect(&s, "127.0.0.1", port);
+    mu_assert("failed to connect to server socket", result);
+    result = client_socket_send(&s, "asdf", 4);
+    mu_assert("failed to send data to the server", result);
+  }
+
+  client_socket_close(&s);
   return 0;
 }
 
 static char* client_socket_recv_test() {
   puts("client_socket_recv_test");
-  printf("- not implemented\n");
-  //TODO
-  // Receiving on a closed connection should fail
-  // Fork and recv from a subprocess, make sure if succeeds
+  //const int port = get_next_port();
+  bool result = false;
 
+  ClientSocket s;
+  client_socket_init(&s);
+
+  result = client_socket_recv(&s);
+  mu_assert("receiving on an unconnected socket shouldn't succeed", !result);
+
+/*
+  pid_t pid = fork();
+  if(pid < 0) {
+    perror("Unable to fork during testing");
+    mu_assert("should fork successfully during testing", false);
+  }
+  else if(pid == 0) {
+    // Child process: open a server, accept a connection, and send something
+    ServerSocket server;
+    server_socket_init(&server);
+    server_socket_bind(&server, port);
+    server_socket_listen(&server, 5);
+    //TODO - send. need a generic send function
+    sleep(2); // Wait for client to connect
+    exit(0);
+  }
+  else {
+    // Parent process: accept connection and read data
+    usleep(250 * 1000);
+    server_socket_listen(&s, 1);
+    result = server_socket_accept(&s, &c);
+    mu_assert("didn't accept a pending connection", result);
+    mu_assert("didn't set the client's file descriptor", c.fd != -1);
+    result = server_socket_read(&s);
+    mu_assert("read from client socket failed", result);
+    mu_assert("expected number of bytes not read", s.data_len == 4);
+    mu_assert("expected data not read", strnlen(s.data, "asdf", 4) == 0);
+  }
+*/
+
+  client_socket_close(&s);
   return 0;
 }
 
@@ -140,16 +214,19 @@ static char* server_socket_listen_test() {
 
 static char* server_socket_accept_test() {
   puts("server_socket_accept_test");
+  bool result = false;
+  const int port = get_next_port();
+
   ClientSocket c;
   ServerSocket s;
   client_socket_init(&c);
   server_socket_init(&s);
   server_socket_set_blocking(&s, false);
 
-  bool result = server_socket_accept(&s, &c);
+  result = server_socket_accept(&s, &c);
   mu_assert("should fail with unbound socket", !result);
 
-  server_socket_bind(&s, 8000);
+  server_socket_bind(&s, port);
   result = server_socket_accept(&s, &c);
   mu_assert("should fail with non-listening socket", !result);
 
@@ -166,20 +243,21 @@ static char* server_socket_accept_test() {
     perror("Unable to fork during testing");
     mu_assert("should fork successfully during testing", false);
   }
-  if(pid == 0) {
-    // Child process. Open a connection to port 8000.
+  else if(pid == 0) {
+    // Child process: open a connection to the server
     ClientSocket pending;
     client_socket_init(&pending);
-    client_socket_connect(&pending, "127.0.0.1", 8000);
+    client_socket_connect(&pending, "127.0.0.1", port);
     exit(0);
   }
-
-  // Wait a bit for the child process, then accept
-  usleep(250 * 1000);
-  server_socket_listen(&s, 1);
-  result = server_socket_accept(&s, &c);
-  mu_assert("didn't accept a pending connection", result);
-  mu_assert("didn't set the client's file descriptor", c.fd != -1);
+  else {
+    // Wait a bit for the child process, then accept
+    usleep(250 * 1000);
+    server_socket_listen(&s, 1);
+    result = server_socket_accept(&s, &c);
+    mu_assert("didn't accept a pending connection", result);
+    mu_assert("didn't set the client's file descriptor", c.fd != -1);
+  }
 
   server_socket_close(&s);
   return 0;
