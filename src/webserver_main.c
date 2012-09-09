@@ -1,3 +1,9 @@
+//==============================================================================
+// Entry point for webserver program. Parses command-line inputs, prints usage
+// info, and runs the webserver.
+//
+// Evan Kuhn 2012-09-09
+//==============================================================================
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

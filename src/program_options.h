@@ -1,3 +1,9 @@
+//==============================================================================
+// Struct containing webserver command-line options, plus a function for parsing
+// the command-line args and populating the struct.
+//
+// Evan Kuhn 2012-09-09
+//==============================================================================
 #ifndef PROGRAM_OPTIONS_H
 #define PROGRAM_OPTIONS_H
 
