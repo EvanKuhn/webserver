@@ -456,9 +456,6 @@ char* test_sockets() {
   mu_run_test(server_socket_accept_poll_test);
   mu_run_test(server_socket_close_test);
 
-  //TODO - server_socket_accept_poll_should_wait - make sure it doesn't immediately timeout
-  //TODO - server_socket_set_blocking_test
-
   return msg;
 }
 
