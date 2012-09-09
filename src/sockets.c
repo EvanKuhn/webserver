@@ -105,7 +105,6 @@ Status server_socket_init(ServerSocket* s) {
   // Start from invalid/zero values
   s->fd = -1;
   memset(&s->addr, 0, sizeof(s->addr));
-  s->blocking = true;
 
   // Create the socket
   s->fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -116,7 +115,7 @@ Status server_socket_init(ServerSocket* s) {
   s->addr.sin_addr.s_addr = INADDR_ANY;
 
   // Enable blocking IO
-  server_socket_set_blocking(s, s->blocking);
+  server_socket_set_blocking(s, true);
   return get_status(true);
 }
 
@@ -128,11 +127,7 @@ Status server_socket_set_blocking(ServerSocket* s, bool blocking) {
   // Set flags to non-blocking
   flags = (blocking ? flags & (~O_NONBLOCK) : flags | O_NONBLOCK);
   const int result = fcntl(s->fd, F_SETFL, flags);
-  Status status = get_status(result != -1);
-
-  // If successful, save blocking flag. Then return.
-  if(status.ok) s->blocking = blocking;
-  return status;
+  return get_status(result != -1);
 }
 
 Status server_socket_bind(ServerSocket* s, int port) {
