@@ -17,6 +17,8 @@ int main(int argc, char **argv) {
   else    printf("\nALL TESTS PASSED\n");
   printf("Tests run: %d\n", tests_run);
 
+  //TODO - at end of tests, check for and kill all child processes
+
   // Exit with success or failure
   return msg != 0;
 }

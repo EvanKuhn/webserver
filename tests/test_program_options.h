@@ -50,6 +50,7 @@ static char* program_options_supports_help() {
 char* test_program_options() {
   silence_parse_options = true;
   char* msg = NULL;
+  printf("\n");
   mu_run_test(program_options_sets_defaults);
   mu_run_test(program_options_parses_port);
   mu_run_test(program_options_requires_port_arg);

@@ -6,6 +6,9 @@
 #include <stdbool.h>
 #include <string.h>
 
+// TODO - create a client_socket_clear_data() function?
+// TODO - instead of a bool, return a struct with status and errno ?
+
 //==============================================================================
 // ClientSocket
 //==============================================================================
@@ -53,7 +56,6 @@ bool server_socket_init(ServerSocket* s);
 
 // Enable or disable blocking IO for the socket.
 // - Blocking IO enabled by default.
-// - Must be called before
 bool server_socket_set_blocking(ServerSocket* s, bool blocking);
 
 // Bind the socket to a port
@@ -67,6 +69,14 @@ bool server_socket_listen(ServerSocket* s, int max_pending);
 //   errno equals EWOULDBLOCK. If so, it's not an error, but rather there are
 //   no pending connections.
 bool server_socket_accept(ServerSocket* s, ClientSocket* c);
+
+// Accept a connection on a server socket by polling. The ServerSocket must be
+// set to non-blocking for this to work properly. Returns true on success and
+// false on error or timeout.
+bool server_socket_accept_poll(ServerSocket* server,
+                               ClientSocket* client,
+                               int wait_time_ms,
+                               int timeout_ms);
 
 // Close a server socket
 // - If successful, sets file descriptor to -1
