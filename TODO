@@ -1,3 +1,5 @@
+HttpRequest class and tests
+
 New socket functionality and tests
 - client_socket_clear_data()
 - server_socket_accept_poll_should_wait() tests: makes surethe accept-poll

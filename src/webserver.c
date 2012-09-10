@@ -1,4 +1,5 @@
 #include "webserver.h"
+#include "http_request.h"
 #include "sockets.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -77,13 +78,12 @@ void start_server(int port) {
       printf("Got no data from client\n");
     }
 
-    // TODO - Parse request, write a response
-    /*
+    // Parse request, write a response
     HttpRequest request;
-    http_request_parse(&request, client.data, client.data_len);
+    http_request_parse(&request, client.data);
     // etc...
-    http_request_free(request);
-    */
+    http_request_free(&request);
+
 
     // Close the client socket
     client_socket_close(&client);
