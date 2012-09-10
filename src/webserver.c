@@ -1,77 +1,91 @@
 #include "webserver.h"
+#include "sockets.h"
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 
-void start_server(int port) {
-  printf("starting server on port %i\n", port);
-  int result = 0;
+//==============================================================================
+// Constants and utilities
+//==============================================================================
+// Max number of incoming connections that may be queued by the server's socket
+const int MAX_PENDING_CONNS = 100;
 
+// Check status. On error, print message and return from calling function.
+#define return_on_error(status, errmsg) \
+if(!status.ok) { \
+  printf("%s (errno: %i)\n", errmsg, status.errnum); \
+  return; \
+}
+
+// Check status. On error, print message and continue calling loop.
+#define continue_on_error(status, errmsg) \
+if(!status.ok) { \
+  printf("%s (errno: %i)\n", errmsg, status.errnum); \
+  continue; \
+}
+
+//==============================================================================
+// Webserver functions
+//==============================================================================
+void start_server(int port) {
+  printf("Starting server on port %i\n", port);
   printf("Initializing\n");
 
-  int server_socket = socket(AF_INET, SOCK_STREAM, 0);
-  if(server_socket == -1) {
-    perror("Error creating socket");
-    return;
-  }
+  // Create and initialize the socket
+  ServerSocket server;
+  Status status;
 
-  // Initialize the socket description
-  struct sockaddr_in server_addr;
-  memset(&server_addr, 0, sizeof(server_addr));
+  status = server_socket_init(&server);
+  return_on_error(status, "Error initializing server socket");
 
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_addr.s_addr = INADDR_ANY;
-  server_addr.sin_port = htons(port);
+  status = server_socket_bind(&server, port);
+  return_on_error(status, "Error binding socket to port");
 
-  // bind the socket to the port specified above
-  result = bind(server_socket,
-                (struct sockaddr*)&server_addr,
-                sizeof(server_addr));
-  if(result == -1) {
-    perror("Unable to bind socket");
-    return;
-  }
+  status = server_socket_listen(&server, MAX_PENDING_CONNS);
+  return_on_error(status, "Error having socket listen for incoming connections");
 
+  printf("Server now listening for incoming connections on port %i\n", port);
+
+  // Accept incoming connections and service their requests
   while(1) {
-    // Listen for incoming connections
-    result = listen(server_socket, 5);
-    if(result == -1) {
-      perror("Socket unable to listen");
-      break;
+    ClientSocket client;
+    client_socket_init(&client);
+
+    // Accept the next connection. On failure, try again.
+    status = server_socket_accept(&server, &client);
+    continue_on_error(status, "Error accepting incoming connection");
+
+    // Where is the connection coming from?
+    printf("Accepted client connection from %s:%i\n",
+           inet_ntoa(client.addr.sin_addr), //TODO - client_socket_get_ip (use inet_ntoa_r?)
+           ntohs(client.addr.sin_port));    //TODO - client_socket_get_port
+
+    // Read the incoming data
+    status = client_socket_recv(&client);
+    continue_on_error(status, "Error reading data from client");
+
+    // Print data received
+    if(client.data_len) {
+      printf("------------ received ------------\n");
+      printf("%s", client.data);
+      printf("----------------------------------\n");
+    }
+    else {
+      printf("Got no data from client\n");
     }
 
-    // Accept incoming connections
-    printf("Listening on port %i\n", ntohs(server_addr.sin_port));
-    struct sockaddr_in client_addr;
-    socklen_t client_len = sizeof(client_addr);
-    int client_socket = accept(server_socket,
-                               (struct sockaddr*)&client_addr,
-                               &client_len);
-    if(client_socket == -1) {
-      perror("Unable to accept client socket\n");
-      break;
-    }
-    printf("Got client socket on port %i\n", ntohs(client_addr.sin_port));
+    // TODO - Parse request, write a response
+    /*
+    HttpRequest request;
+    http_request_parse(&request, client.data, client.data_len);
+    // etc...
+    http_request_free(request);
+    */
 
-    // Read data from the socket
-    char data[2048] = {0};
-    if(recv(client_socket, data, 2048, 0) < 0) {
-      perror("Error getting data from socket");
-      break;
-    }
-    printf("Got data: %s\n", data);
-
-    // Echo the data back
-    if(send(client_socket, data, strlen(data), 0) < 0) {
-      perror("Error sending data back to client");
-      break;
-    }
-    printf("Echoed data back to client\n");
-
-    // Close the socket
-    printf("Closing socket\n");
-    close(client_socket);
+    // Close the client socket
+    client_socket_close(&client);
   }
 }

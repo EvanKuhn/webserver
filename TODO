@@ -3,11 +3,28 @@ New socket functionality and tests
 - server_socket_accept_poll_should_wait() tests: makes surethe accept-poll
   function doesn't immediately timeout
 - server_socket_set_blocking_test()
-- function to get socket flags?
-
-At end of tests, check for and kill all child processes
+- Function to get socket flags?
+- At end of tests, check for and kill all child processes
 
 Get webserver responding to some basic request
+- Test with 'curl'
+- Start with HEAD and GET?
 
 Add support for HTTP headers
 - need to figure out which ones to start with
+
+We will need a config file to house settings:
+- MAX_PENDING_CONNS
+- ...
+
+
+
+Scratch stuff:
+
+uint16_t client_socket_get_port(ClientSocket* s) {
+  return ntohs(s->addr.sin_port);
+}
+
+char* client_socket_get_ip_str(ClientSocket* s) {
+  inet_ntoa(s->addr.sin_addr);
+}

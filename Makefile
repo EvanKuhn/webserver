@@ -11,7 +11,7 @@ all: $(OBJECTS) bin/webserver bin/run_tests
 src/program_options.o: src/program_options.h
 src/sockets.o: src/sockets.h src/status.h
 src/status.o: src/status.h
-src/webserver.o: src/webserver.h
+src/webserver.o: src/webserver.h src/sockets.h
 src/webserver_main.o: src/program_options.h src/webserver.h
 tests/run_tests.o: $(SOURCES) $(TESTS)
 
