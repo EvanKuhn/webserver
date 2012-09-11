@@ -36,42 +36,41 @@ void start_server(int port) {
   printf("Initializing\n");
 
   // Create and initialize the socket
-  ServerSocket server;
+  ServerSocket* server = server_socket_new();
   Status status;
 
-  status = server_socket_init(&server);
+  status = server_socket_init(server);
   return_on_error(status, "Error initializing server socket");
 
-  status = server_socket_bind(&server, port);
+  status = server_socket_bind(server, port);
   return_on_error(status, "Error binding socket to port");
 
-  status = server_socket_listen(&server, MAX_PENDING_CONNS);
+  status = server_socket_listen(server, MAX_PENDING_CONNS);
   return_on_error(status, "Error having socket listen for incoming connections");
 
   printf("Server now listening for incoming connections on port %i\n", port);
 
   // Accept incoming connections and service their requests
   while(1) {
-    ClientSocket client;
-    client_socket_init(&client);
+    ClientSocket* client = client_socket_new();
 
     // Accept the next connection. On failure, try again.
-    status = server_socket_accept(&server, &client);
+    status = server_socket_accept(server, client);
     continue_on_error(status, "Error accepting incoming connection");
 
     // Where is the connection coming from?
     printf("Accepted client connection from %s:%i\n",
-           inet_ntoa(client.addr.sin_addr), //TODO - client_socket_get_ip (use inet_ntoa_r?)
-           ntohs(client.addr.sin_port));    //TODO - client_socket_get_port
+           client_socket_get_ip(client),
+           client_socket_get_port(client));
 
     // Read the incoming data
-    status = client_socket_recv(&client);
+    status = client_socket_recv(client);
     continue_on_error(status, "Error reading data from client");
 
     // Print data received
-    if(client.data_len) {
+    if(client_socket_get_data(client)) {
       printf("------------ received ------------\n");
-      printf("%s", client.data);
+      printf("%s", client_socket_get_data(client));
       printf("----------------------------------\n");
     }
     else {
@@ -81,12 +80,22 @@ void start_server(int port) {
     // Parse request, write a response
     HttpRequest request;
     http_request_init(&request);
-    http_request_parse(&request, client.data);
-    // etc...
+    http_request_parse(&request, client_socket_get_data(client));
+
+    // Write response
+    char buf[1024] = {0};
+    snprintf(buf, 1024, "Accepted client connection from %s:%i\n",
+             client_socket_get_ip(client),
+             client_socket_get_port(client));
+
+    client_socket_send(client, buf, 1024);
     http_request_free(&request);
 
 
     // Close the client socket
-    client_socket_close(&client);
+    client_socket_close(client);
   }
+
+  // Free resources
+  server_socket_free(server);
 }

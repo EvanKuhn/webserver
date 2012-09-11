@@ -1,4 +1,5 @@
 #include "sockets.h"
+#include "types/socket_structs.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -17,11 +18,18 @@ const int CLIENT_SOCKET_RECV_BUFFER_SIZE = 1024;
 //==============================================================================
 // ClientSocket
 //==============================================================================
-void client_socket_init(ClientSocket* s) {
+void client_socket_clear(ClientSocket* s) {
   s->fd = -1;
   memset(&s->addr, 0, sizeof(s->addr));
   s->data = 0;
   s->data_len = 0;
+  s->ip_buf = 0;
+}
+
+ClientSocket* client_socket_new() {
+  ClientSocket* s = malloc(sizeof(ClientSocket));
+  client_socket_clear(s);
+  return s;
 }
 
 Status client_socket_connect(ClientSocket* s, const char* ip, int port) {
@@ -40,7 +48,7 @@ Status client_socket_connect(ClientSocket* s, const char* ip, int port) {
   Status status = get_status(result != -1);
 
   // If we failed, reinitialize the socket
-  if(!status.ok) client_socket_init(s);
+  if(!status.ok) client_socket_clear(s);
   return status;
 }
 
@@ -84,6 +92,18 @@ Status client_socket_recv(ClientSocket* s) {
   }
 }
 
+char* client_socket_get_data(ClientSocket* s) {
+  return s->data;
+}
+
+const char* client_socket_get_ip(ClientSocket* s) {
+  return inet_ntoa(s->addr.sin_addr);
+}
+
+uint16_t client_socket_get_port(ClientSocket* s) {
+  return ntohs(s->addr.sin_port);
+}
+
 Status client_socket_close(ClientSocket* s) {
   const int result = close(s->fd);
   const Status status = get_status(result != -1);
@@ -98,14 +118,22 @@ Status client_socket_close(ClientSocket* s) {
   return status;
 }
 
+void client_socket_free(ClientSocket* s) {
+  client_socket_close(s);
+  free(s);
+}
+
 //==============================================================================
 // ServerSocket
 //==============================================================================
-Status server_socket_init(ServerSocket* s) {
-  // Start from invalid/zero values
+ServerSocket* server_socket_new() {
+  ServerSocket* s = malloc(sizeof(ServerSocket));
   s->fd = -1;
   memset(&s->addr, 0, sizeof(s->addr));
+  return s;
+}
 
+Status server_socket_init(ServerSocket* s) {
   // Create the socket
   s->fd = socket(AF_INET, SOCK_STREAM, 0);
   if(s->fd == -1) return get_status(false);
@@ -181,4 +209,9 @@ Status server_socket_close(ServerSocket* s) {
   const Status status = get_status(result != -1);
   if(status.ok) s->fd = -1;
   return status;
+}
+
+void server_socket_free(ServerSocket* s) {
+  server_socket_close(s);
+  free(s);
 }

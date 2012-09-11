@@ -4,17 +4,18 @@ CFLAGS  = -c -std=c99 -Wall -Isrc -Ilib -Werror
 SOURCES = src/http_request.c src/program_options.c src/sockets.c src/status.c src/webserver.c
 OBJECTS = $(SOURCES:.c=.o)
 TESTS   = tests/test_program_options.h tests/test_sockets.h
+STRUCTS = src/types/socket_structs.h
 
 all: $(OBJECTS) bin/webserver bin/run_tests
 
 # Object file dependencies
 src/http_request.o: src/http_request.h
 src/program_options.o: src/program_options.h
-src/sockets.o: src/sockets.h src/status.h
+src/sockets.o: src/sockets.h src/status.h src/types/socket_structs.h
 src/status.o: src/status.h
 src/webserver.o: src/webserver.h src/sockets.h src/http_request.h
 src/webserver_main.o: src/program_options.h src/webserver.h
-tests/run_tests.o: $(SOURCES) $(TESTS)
+tests/run_tests.o: $(SOURCES) $(TESTS) $(STRUCTS)
 
 # Executables
 bin/webserver: $(OBJECTS) src/webserver_main.o

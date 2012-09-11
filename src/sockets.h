@@ -15,16 +15,10 @@
 //==============================================================================
 // ClientSocket
 //==============================================================================
-struct ClientSocket {
-  int                fd;       // File descriptor
-  struct sockaddr_in addr;     // Address
-  char*              data;     // Data last read
-  size_t             data_len; // Length of data last read
-};
 typedef struct ClientSocket ClientSocket;
 
 // Initialize the socket
-void client_socket_init(ClientSocket* s);
+ClientSocket* client_socket_new();
 
 // Connect to a server listening on the given IP address and port
 Status client_socket_connect(ClientSocket* s, const char* ip, int port);
@@ -32,26 +26,32 @@ Status client_socket_connect(ClientSocket* s, const char* ip, int port);
 // Send data over the client socket
 Status client_socket_send(ClientSocket* s, void* buf, size_t bufsize);
 
-// Receive data from the socket.
-// - Data will be placed in ClientSocket::data.
-// - Data array size will be written to ClientSocket::data_len.
-// - Any existing data array will be deleted.
+// Receive data from the socket. Overwrites previously-received data.
 Status client_socket_recv(ClientSocket* s);
 
-// Close the socket and clean up any allocated resource, like data, within the
-// ClientSocket struct.
+// Get the last set of data received
+char* client_socket_get_data(ClientSocket* s);
+
+// Get the IP address that the socket is connected to
+const char* client_socket_get_ip(ClientSocket* s);
+
+// Get the port that the socket is connected to
+uint16_t client_socket_get_port(ClientSocket* s);
+
+// Close the socket and clean up any allocated resource.
 // - Will always clean up data, even if it fails to close the socket.
-// - If succesful, sets file descriptor to -1
 Status client_socket_close(ClientSocket* s);
+
+// Close the client socket and free the object
+void client_socket_free(ClientSocket* s);
 
 //==============================================================================
 // ServerSocket
 //==============================================================================
-struct ServerSocket {
-  int                fd;       // File descriptor
-  struct sockaddr_in addr;     // Address
-};
 typedef struct ServerSocket ServerSocket;
+
+// Create a new server socket
+ServerSocket* server_socket_new();
 
 // Initialize the socket
 Status server_socket_init(ServerSocket* s);
@@ -83,5 +83,8 @@ Status server_socket_accept_poll(ServerSocket* server,
 // Close a server socket
 // - If successful, sets file descriptor to -1
 Status server_socket_close(ServerSocket* s);
+
+// Close the server socket and free the object
+void server_socket_free(ServerSocket* s);
 
 #endif // SOCKETS_H
