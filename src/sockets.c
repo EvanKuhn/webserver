@@ -23,7 +23,6 @@ void client_socket_clear(ClientSocket* s) {
   memset(&s->addr, 0, sizeof(s->addr));
   s->data = 0;
   s->data_len = 0;
-  s->ip_buf = 0;
 }
 
 ClientSocket* client_socket_new() {

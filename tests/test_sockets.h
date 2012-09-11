@@ -39,7 +39,6 @@ static char* client_socket_new_test() {
   mu_assert("failed to initialize the file descriptor", s->fd == -1);
   mu_assert("failed to initialize the data pointer", s->data == 0);
   mu_assert("failed to initialize the data length", s->data_len == 0);
-  mu_assert("failed to initialize the ip_buf", s->ip_buf == 0);
   client_socket_free(s);
   return 0;
 }
