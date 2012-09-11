@@ -80,6 +80,7 @@ void start_server(int port) {
 
     // Parse request, write a response
     HttpRequest request;
+    http_request_init(&request);
     http_request_parse(&request, client.data);
     // etc...
     http_request_free(&request);
