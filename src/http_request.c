@@ -1,7 +1,42 @@
 #include "http_request.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+
+//==============================================================================
+// Utilities
+//==============================================================================
+
+// Examine the input string and find the next token
+// - Will place a null-terminator at end of token
+// - Returns the length of the token
+// - Returns the token's beginning and ending chars via tok_begin and tok_end
+// - Splits tokens by whitespace
+// - Ignores multiple whitespace chars
+// - Ignores leading / trailing whitespace
+size_t next_token(char* str, char** tok_begin, char** tok_end) {
+  // Find first non-whitespace char, or null terminator
+  char* first = str;
+  while(first && isspace(*first)) {
+    ++first;
+  }
+
+  // Advance to next whitespace char, or null terminator
+  char* last = first;
+  while(last && !isspace(*last)) {
+    ++last;
+  }
+
+  // Terminate token
+  if(last) *last = 0;
+
+  // Set output vars and return length of string
+  *tok_begin = first;
+  *tok_end = last;
+  return (last - first);
+}
 
 //==============================================================================
 // HttpHeader
@@ -39,9 +74,10 @@ void http_header_set_val(HttpHeader* header, char* val) {
 // HttpRequest
 //==============================================================================
 void http_request_init(HttpRequest* request) {
-  request->type = HTTP_REQUEST_TYPE_UNKNOWN;
-  request->headers = 0;
+  request->version = HTTP_VERSION_UNKNOWN;
+  request->method = HTTP_METHOD_UNKNOWN;
   request->num_headers = 0;
+  request->headers = 0;
   request->body = 0;
 }
 
@@ -51,10 +87,61 @@ void http_request_free(HttpRequest* request) {
   http_request_init(request);
 }
 
+// Parse the HTTP request line
+// Format:  Method SP Request-URI SP HTTP-Version CRLF
+// Example: GET / HTTP/1.1
+bool http_request_parse_request_line(HttpRequest* request, char* line) {
+  printf("HTTP request: %s\n", line);
+  char* first = 0;
+  char* last = 0;
+
+  // Token 1: HTTP method
+  if(!next_token(line, &first, &last)) {
+    fprintf(stderr, "Error parsing HTTP header line: didn't find method (token 1)");
+    return false;
+  }
+
+  if(strcmp(first, "GET") == 0) {
+    request->method = HTTP_METHOD_GET;
+  }
+  else if(strcmp(first, "HEAD") == 0) {
+    request->method = HTTP_METHOD_HEAD;
+  }
+  else if(strcmp(first, "POST") == 0) {
+    request->method = HTTP_METHOD_POST;
+  }
+  else if(strcmp(first, "PUT") == 0) {
+    request->method = HTTP_METHOD_PUT;
+  }
+  else {
+    fprintf(stderr, "Error parsing HTTP header line: unknown method \"%s\"\n", first);
+    return false;
+  }
+
+  // Token 2: URI
+  first = last + 1;
+  if(!next_token(line, &first, &last)) {
+    fprintf(stderr, "Error parsing HTTP header line: didn't find request URI (token 2)");
+    return false;
+  }
+  // TODO - store URI
+
+  // Token 3: HTTP version
+  first = last + 1;
+  if(!next_token(line, &first, &last)) {
+    fprintf(stderr, "Error parsing HTTP header line: didn't find HTTP version (token 3)");
+    return false;
+  }
+  // TODO - store version
+
+
+  return true;
+}
+
 void http_request_parse(HttpRequest* request, char* text) {
   // Get first line: HTTP version, method, URL
   char* curline = strsep(&text, "\n");
-  printf("HTTP line 1: %s\n", curline);
+  http_request_parse_request_line(request, curline);
 
   // Parse headers
   while(curline) {

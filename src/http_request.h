@@ -14,18 +14,18 @@
 //==============================================================================
 // HTTP versions
 enum EHttpVersion {
+  HTTP_VERSION_UNKNOWN,
   HTTP_VERSION_1_0,
-  HTTP_VERSION_1_1,
-  HTTP_VERSION_UNKNOWN
+  HTTP_VERSION_1_1
 };
 
-// HTTP request types
-enum EHttpRequestType {
-  HTTP_GET,
-  HTTP_HEAD,
-  HTTP_POST,
-  HTTP_PUT,
-  HTTP_REQUEST_TYPE_UNKNOWN
+// HTTP methods
+enum EHttpMethod {
+  HTTP_METHOD_UNKNOWN,
+  HTTP_METHOD_GET,
+  HTTP_METHOD_HEAD,
+  HTTP_METHOD_POST,
+  HTTP_METHOD_PUT
 };
 
 //==============================================================================
@@ -48,11 +48,12 @@ void http_header_set_val(HttpHeader* header, char* val);
 // Struct containing all info from an HTTP request
 //==============================================================================
 typedef struct HttpRequest {
-  enum EHttpVersion     version;      // HTTP version
-  enum EHttpRequestType type;         // Request type
-  size_t                num_headers;  // Number of headers
-  HttpHeader*           headers;      // Array of headers
-  char*                 body;         // Request body
+  enum EHttpVersion version;      // HTTP version
+  enum EHttpMethod  method;       // HTTP method
+  char*             uri;          // URI of resource
+  size_t            num_headers;  // Number of headers
+  HttpHeader*       headers;      // Array of headers
+  char*             body;         // Request body
 } HttpRequest;
 
 // Initialize or free the struct's fields
