@@ -38,6 +38,12 @@ Status client_socket_send(ClientSocket* s, void* buf, size_t bufsize);
 // - Any existing data array will be deleted.
 Status client_socket_recv(ClientSocket* s);
 
+// Get the IP address that the socket is connected to
+const char* client_socket_get_ip(ClientSocket* s);
+
+// Get the port that the socket is connected to
+uint16_t client_socket_get_port(ClientSocket* s);
+
 // Close the socket and clean up any allocated resource, like data, within the
 // ClientSocket struct.
 // - Will always clean up data, even if it fails to close the socket.

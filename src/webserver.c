@@ -61,8 +61,8 @@ void start_server(int port) {
 
     // Where is the connection coming from?
     printf("Accepted client connection from %s:%i\n",
-           inet_ntoa(client.addr.sin_addr), //TODO - client_socket_get_ip (use inet_ntoa_r?)
-           ntohs(client.addr.sin_port));    //TODO - client_socket_get_port
+           client_socket_get_ip(&client),
+           client_socket_get_port(&client));
 
     // Read the incoming data
     status = client_socket_recv(&client);

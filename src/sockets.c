@@ -84,6 +84,14 @@ Status client_socket_recv(ClientSocket* s) {
   }
 }
 
+const char* client_socket_get_ip(ClientSocket* s) {
+  return inet_ntoa(s->addr.sin_addr);
+}
+
+uint16_t client_socket_get_port(ClientSocket* s) {
+  return ntohs(s->addr.sin_port);
+}
+
 Status client_socket_close(ClientSocket* s) {
   const int result = close(s->fd);
   const Status status = get_status(result != -1);
