@@ -78,9 +78,8 @@ void start_server(int port) {
     }
 
     // Parse request, write a response
-    HttpRequest request;
-    http_request_init(&request);
-    http_request_parse(&request, client_socket_get_data(client));
+    HttpRequest* request = http_request_new();
+    http_request_parse(request, client_socket_get_data(client));
 
     // Write response
     char buf[1024] = {0};
@@ -89,10 +88,9 @@ void start_server(int port) {
              client_socket_get_port(client));
 
     client_socket_send(client, buf, 1024);
-    http_request_free(&request);
 
-
-    // Close the client socket
+    // Free allocated resources
+    http_request_free(request);
     client_socket_close(client);
   }
 

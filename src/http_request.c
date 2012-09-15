@@ -1,4 +1,5 @@
 #include "http_request.h"
+#include "types/http_request_structs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,7 +40,25 @@ void http_header_free(HttpHeader* header) {
 //==============================================================================
 // HttpRequest
 //==============================================================================
-void http_request_init(HttpRequest* request) {
+HttpRequest* http_request_new() {
+  HttpRequest* request = malloc(sizeof(HttpRequest));
+  request->type = HTTP_REQUEST_TYPE_UNKNOWN;
+  request->headers = 0;
+  request->num_headers = 0;
+  request->body = 0;
+  return request;
+}
+
+void http_request_free(HttpRequest* request) {
+  http_request_clear(request);
+  free(request);
+}
+
+void http_request_clear(HttpRequest* request) {
+  // Free allocated resources
+  if(request->headers) free(request->headers);
+  if(request->body) free(request->body);
+  // Reset values
   request->type = HTTP_REQUEST_TYPE_UNKNOWN;
   request->headers = 0;
   request->num_headers = 0;
@@ -75,7 +94,22 @@ void http_request_parse(HttpRequest* request, char* text) {
   //TODO
 }
 
-void http_request_free(HttpRequest* request) {
-  if(request->headers) free(request->headers);
-  if(request->body) free(request->body);
+enum EHttpVersion http_request_get_version(HttpRequest* request) {
+  return request->version;
+}
+
+enum EHttpRequestType http_request_get_type(HttpRequest* request) {
+  return request->type;
+}
+
+size_t http_request_num_headers(HttpRequest* request) {
+  return request->num_headers;
+}
+
+HttpHeader* http_request_get_headers(HttpRequest* request) {
+  return request->heders;
+}
+
+char* http_request_get_body(HttpRequest* request) {
+  return request->body;
 }
