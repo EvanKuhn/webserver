@@ -15,15 +15,14 @@
 //==============================================================================
 // ClientSocket
 //==============================================================================
-struct ClientSocket {
-  int                fd;       // File descriptor
-  struct sockaddr_in addr;     // Address
-  char*              data;     // Data last read
-  size_t             data_len; // Length of data last read
-};
-typedef struct ClientSocket ClientSocket;
+typedef struct ClientSocket {
+  int                fd;        // File descriptor
+  struct sockaddr_in addr;      // Address
+  char*              data;      // Data last read
+  size_t             data_len;  // Length of data buffer
+} ClientSocket;
 
-// Initialize the socket
+// Initialize the socket's fields
 void client_socket_init(ClientSocket* s);
 
 // Connect to a server listening on the given IP address and port
@@ -53,13 +52,12 @@ Status client_socket_close(ClientSocket* s);
 //==============================================================================
 // ServerSocket
 //==============================================================================
-struct ServerSocket {
-  int                fd;       // File descriptor
-  struct sockaddr_in addr;     // Address
-};
-typedef struct ServerSocket ServerSocket;
+typedef struct ServerSocket {
+  int                fd;    // File descriptor
+  struct sockaddr_in addr;  // Address
+} ServerSocket;
 
-// Initialize the socket
+// Initialize the socket's fields
 Status server_socket_init(ServerSocket* s);
 
 // Enable or disable blocking IO for the socket.

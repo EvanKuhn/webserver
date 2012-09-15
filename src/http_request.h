@@ -9,7 +9,17 @@
 
 #include <sys/types.h>
 
-// Enum of HTTP request types
+//==============================================================================
+// Enums
+//==============================================================================
+// HTTP versions
+enum EHttpVersion {
+  HTTP_VERSION_1_0,
+  HTTP_VERSION_1_1,
+  HTTP_VERSION_UNKNOWN
+};
+
+// HTTP request types
 enum EHttpRequestType {
   HTTP_GET,
   HTTP_HEAD,
@@ -26,37 +36,30 @@ typedef struct HttpHeader {
   char* val;
 } HttpHeader;
 
-// Initialize struct's fields
+// Initialize or free the struct's fields
 void http_header_init(HttpHeader* header);
+void http_header_free(HttpHeader* header);
 
 // Set the key or value
 void http_header_set_key(HttpHeader* header, char* key);
 void http_header_set_val(HttpHeader* header, char* val);
 
-// Free allocated data
-void http_header_free(HttpHeader* header);
-
 //==============================================================================
 // Struct containing all info from an HTTP request
 //==============================================================================
 typedef struct HttpRequest {
-  enum EHttpRequestType type;  // Request type
-  HttpHeader* headers;         // Array of headers
-  size_t num_headers;          // Number of headers
-  char* body;                  // Request body
+  enum EHttpVersion     version;      // HTTP version
+  enum EHttpRequestType type;         // Request type
+  size_t                num_headers;  // Number of headers
+  HttpHeader*           headers;      // Array of headers
+  char*                 body;         // Request body
 } HttpRequest;
 
-// Initialize struct's fields
+// Initialize or free the struct's fields
 void http_request_init(HttpRequest* request);
-
-// Parse the request and populated the struct's fields.
-// - You MUST call http_request_free() after http_request_parse() to free
-//   allocated resources referenced within the HttpRequest object.
-// - If reusing an HttpRequest object, first free it using http_request_free().
-//   Otherwise a memory leak will occur.
-void http_request_parse(HttpRequest* request, char* text);
-
-// Free resources allocated during parsing
 void http_request_free(HttpRequest* request);
+
+// Parse the request and populated the struct's fields
+void http_request_parse(HttpRequest* request, char* text);
 
 #endif // HTTP_REQUEST_H

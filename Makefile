@@ -3,7 +3,7 @@ CC      = gcc
 CFLAGS  = -c -std=c99 -Wall -Isrc -Ilib -Werror
 SOURCES = src/http_request.c src/program_options.c src/sockets.c src/status.c src/webserver.c
 OBJECTS = $(SOURCES:.c=.o)
-TESTS   = tests/test_program_options.h tests/test_sockets.h
+TESTS   = tests/test_http_request.h tests/test_program_options.h tests/test_sockets.h
 
 all: $(OBJECTS) bin/webserver bin/run_tests
 

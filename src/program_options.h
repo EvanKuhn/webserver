@@ -10,15 +10,15 @@
 #include <stdbool.h>
 
 // ProgramOptions struct
-typedef struct {
+typedef struct ProgramOptions {
   int port;
   bool help;
 } ProgramOptions;
 
 // Parse program options from the command-line inputs
-bool parse_options(int argc, char** argv, ProgramOptions* options);
+bool program_options_parse(ProgramOptions* options, int argc, char** argv);
 
-// Flag to tell parse_options not to print error messages. For testing.
-extern bool silence_parse_options;
+// Flag to tell program_options_parse not to print error messages. For testing.
+extern bool silence_program_options_parse;
 
 #endif // PROGRAM_OPTIONS_H

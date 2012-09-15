@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-bool silence_parse_options = false;
+bool silence_program_options_parse = false;
 
-bool parse_options(int argc, char** argv, ProgramOptions* options) {
+bool program_options_parse(ProgramOptions* options, int argc, char** argv) {
   // Tell getopt() not to print error messages
   opterr = 0;
 
@@ -28,7 +28,7 @@ bool parse_options(int argc, char** argv, ProgramOptions* options) {
       options->port = atoi(optarg);
       break;
     case '?':
-      if(!silence_parse_options) {
+      if(!silence_program_options_parse) {
         if(optopt == 'p') {
           fprintf(stderr, "ERROR: Option -p requires an argument\n");
         }

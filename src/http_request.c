@@ -11,6 +11,12 @@ void http_header_init(HttpHeader* header) {
   header->val = 0;
 }
 
+void http_header_free(HttpHeader* header) {
+  if(header->key) free(header->key);
+  if(header->val) free(header->val);
+  http_header_init(header);
+}
+
 void http_header_set_key(HttpHeader* header, char* key) {
   if(header->key) {
     free(header->key);
@@ -29,13 +35,6 @@ void http_header_set_val(HttpHeader* header, char* val) {
   strcpy(header->val, val);
 }
 
-void http_header_free(HttpHeader* header) {
-  if(header->key) free(header->key);
-  if(header->val) free(header->val);
-  header->key = 0;
-  header->val = 0;
-}
-
 //==============================================================================
 // HttpRequest
 //==============================================================================
@@ -44,6 +43,12 @@ void http_request_init(HttpRequest* request) {
   request->headers = 0;
   request->num_headers = 0;
   request->body = 0;
+}
+
+void http_request_free(HttpRequest* request) {
+  if(request->headers) free(request->headers);
+  if(request->body) free(request->body);
+  http_request_init(request);
 }
 
 void http_request_parse(HttpRequest* request, char* text) {
@@ -73,9 +78,4 @@ void http_request_parse(HttpRequest* request, char* text) {
 
   // Depending on type, get input data
   //TODO
-}
-
-void http_request_free(HttpRequest* request) {
-  if(request->headers) free(request->headers);
-  if(request->body) free(request->body);
 }

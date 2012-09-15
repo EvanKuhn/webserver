@@ -23,7 +23,7 @@ const char* usage() {
 int main(int argc, char** argv) {
   // Get options
   ProgramOptions options;
-  if(!parse_options(argc, argv, &options)) {
+  if(!program_options_parse(&options, argc, argv)) {
     fprintf(stderr, "%s", usage());
     exit(1);
   }

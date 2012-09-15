@@ -69,7 +69,7 @@ void start_server(int port) {
     continue_on_error(status, "Error reading data from client");
 
     // Print data received
-    if(client.data_len) {
+    if(client.data) {
       printf("------------ received ------------\n");
       printf("%s", client.data);
       printf("----------------------------------\n");

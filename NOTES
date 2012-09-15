@@ -1,0 +1,20 @@
+test: http_header_init()
+
+test: program_options_parse() sets defaults
+test: program_options_parse() parses port
+test: program_options_parse() requires port arg
+test: program_options_parse() supports help
+
+test: client_socket_init()
+test: client_socket_connect()
+test: client_socket_send()
+test: client_socket_recv() w/ short message
+test: client_socket_recv() w/ long message
+test: client_socket_close()
+
+test: server_socket_init()
+test: server_socket_bind()
+test: server_socket_listen()
+test: server_socket_accept()
+test: server_socket_accept_poll()
+test: server_socket_close()
