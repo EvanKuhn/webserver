@@ -8,14 +8,13 @@
 //==============================================================================
 // Utilities
 //==============================================================================
-
 // Examine the input string and find the next token
-// - Will place a null-terminator at end of token
-// - Returns the length of the token
-// - Returns the token's beginning and ending chars via tok_begin and tok_end
 // - Splits tokens by whitespace
 // - Ignores multiple whitespace chars
 // - Ignores leading / trailing whitespace
+// - Places a null-terminator at end of token
+// - Returns the length of the token
+// - Returns the token's beginning and ending chars via tok_begin and tok_end
 size_t next_token(char* str, char** tok_begin, char** tok_end) {
   // Find first non-whitespace char, or null terminator
   char* first = str;
@@ -39,6 +38,23 @@ size_t next_token(char* str, char** tok_begin, char** tok_end) {
 }
 
 //==============================================================================
+// Enums
+//==============================================================================
+enum EHttpVersion http_version_from_str(const char* str) {
+  if(!strcmp(str, "HTTP/1.0")) return HTTP_VERSION_1_0;
+  if(!strcmp(str, "HTTP/1.1")) return HTTP_VERSION_1_1;
+  return HTTP_VERSION_UNKNOWN;
+}
+
+enum EHttpMethod http_method_from_str(const char* str) {
+  if(!strcmp(str, "GET" )) return HTTP_METHOD_GET;
+  if(!strcmp(str, "HEAD")) return HTTP_METHOD_HEAD;
+  if(!strcmp(str, "POST")) return HTTP_METHOD_POST;
+  if(!strcmp(str, "PUT" )) return HTTP_METHOD_PUT;
+  return HTTP_METHOD_UNKNOWN;
+}
+
+//==============================================================================
 // HttpHeader
 //==============================================================================
 void http_header_init(HttpHeader* header) {
@@ -52,7 +68,7 @@ void http_header_free(HttpHeader* header) {
   http_header_init(header);
 }
 
-void http_header_set_key(HttpHeader* header, char* key) {
+void http_header_set_key(HttpHeader* header, const char* key) {
   if(header->key) {
     free(header->key);
   }
@@ -61,7 +77,7 @@ void http_header_set_key(HttpHeader* header, char* key) {
   strcpy(header->key, key);
 }
 
-void http_header_set_val(HttpHeader* header, char* val) {
+void http_header_set_val(HttpHeader* header, const char* val) {
   if(header->val) {
     free(header->val);
   }
@@ -76,14 +92,16 @@ void http_header_set_val(HttpHeader* header, char* val) {
 void http_request_init(HttpRequest* request) {
   request->version = HTTP_VERSION_UNKNOWN;
   request->method = HTTP_METHOD_UNKNOWN;
+  request->uri = 0;
   request->num_headers = 0;
   request->headers = 0;
   request->body = 0;
 }
 
 void http_request_free(HttpRequest* request) {
+  if(request->uri)     free(request->uri);
   if(request->headers) free(request->headers);
-  if(request->body) free(request->body);
+  if(request->body)    free(request->body);
   http_request_init(request);
 }
 
@@ -91,7 +109,6 @@ void http_request_free(HttpRequest* request) {
 // Format:  Method SP Request-URI SP HTTP-Version CRLF
 // Example: GET / HTTP/1.1
 bool http_request_parse_request_line(HttpRequest* request, char* line) {
-  printf("HTTP request: %s\n", line);
   char* first = 0;
   char* last = 0;
 
@@ -100,31 +117,21 @@ bool http_request_parse_request_line(HttpRequest* request, char* line) {
     fprintf(stderr, "Error parsing HTTP header line: didn't find method (token 1)");
     return false;
   }
-
-  if(strcmp(first, "GET") == 0) {
-    request->method = HTTP_METHOD_GET;
-  }
-  else if(strcmp(first, "HEAD") == 0) {
-    request->method = HTTP_METHOD_HEAD;
-  }
-  else if(strcmp(first, "POST") == 0) {
-    request->method = HTTP_METHOD_POST;
-  }
-  else if(strcmp(first, "PUT") == 0) {
-    request->method = HTTP_METHOD_PUT;
-  }
-  else {
+  request->method = http_method_from_str(first);
+  if(request->method == HTTP_METHOD_UNKNOWN) {
     fprintf(stderr, "Error parsing HTTP header line: unknown method \"%s\"\n", first);
     return false;
   }
 
   // Token 2: URI
   first = last + 1;
-  if(!next_token(line, &first, &last)) {
+  size_t toklen = next_token(line, &first, &last);
+  if(!toklen) {
     fprintf(stderr, "Error parsing HTTP header line: didn't find request URI (token 2)");
     return false;
   }
-  // TODO - store URI
+  request->uri = malloc(toklen + 1);
+  memcpy(request->uri, first, toklen + 1);
 
   // Token 3: HTTP version
   first = last + 1;
@@ -132,15 +139,21 @@ bool http_request_parse_request_line(HttpRequest* request, char* line) {
     fprintf(stderr, "Error parsing HTTP header line: didn't find HTTP version (token 3)");
     return false;
   }
-  // TODO - store version
-
-
+  request->version = http_version_from_str(first);
+  if(request->method == HTTP_VERSION_UNKNOWN) {
+    fprintf(stderr, "Unrecognized HTTP version \"%s\"\n", first);
+    return false;
+  }
   return true;
 }
 
 void http_request_parse(HttpRequest* request, char* text) {
-  // Get first line: HTTP version, method, URL
+  // Clear any existing data and reset the object
+  http_request_free(request);
+
+  // Parse the HTTP request line (the first line): HTTP method, URI, version
   char* curline = strsep(&text, "\n");
+  printf("HTTP request: %s\n", curline); //TODO
   http_request_parse_request_line(request, curline);
 
   // Parse headers
@@ -155,14 +168,15 @@ void http_request_parse(HttpRequest* request, char* text) {
       break;
     }
 
-    // Parse headers
+    // Store header key and value
     printf("HTTP header: %s\n", curline); //TODO
+    //TODO: parse header line, split into key and value, trim both, and copy them
   }
-  printf("DONE WITH HEADERS\n");
 
-  printf("Remaining text: %s\n", (text ? text : "(null)"));
-  printf("- length: %zu\n", (text ? strlen(text) : 0));
-
-  // Depending on type, get input data
-  //TODO
+  // Store the remaining text as the body
+  if(text) {
+    const size_t textlen = strlen(text);
+    request->body = malloc(textlen + 1);
+    memcpy(request->body, text, textlen + 1);
+  }
 }

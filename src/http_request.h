@@ -28,6 +28,10 @@ enum EHttpMethod {
   HTTP_METHOD_PUT
 };
 
+// Convert from string to enum. Returns UNKNOWN enum value on error.
+enum EHttpVersion http_version_from_str(const char* s);
+enum EHttpMethod http_method_from_str(const char* s);
+
 //==============================================================================
 // An HTTP header contains a key and value
 //==============================================================================
@@ -41,8 +45,8 @@ void http_header_init(HttpHeader* header);
 void http_header_free(HttpHeader* header);
 
 // Set the key or value
-void http_header_set_key(HttpHeader* header, char* key);
-void http_header_set_val(HttpHeader* header, char* val);
+void http_header_set_key(HttpHeader* header, const char* key);
+void http_header_set_val(HttpHeader* header, const char* val);
 
 //==============================================================================
 // Struct containing all info from an HTTP request
@@ -61,6 +65,7 @@ void http_request_init(HttpRequest* request);
 void http_request_free(HttpRequest* request);
 
 // Parse the request and populated the struct's fields
+// - Will modify the input string
 void http_request_parse(HttpRequest* request, char* text);
 
 #endif // HTTP_REQUEST_H

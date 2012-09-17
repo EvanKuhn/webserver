@@ -22,9 +22,9 @@ describe :webserver do
 
   it 'accepts connections' do
     expect do
-     s = TCPSocket.open('localhost', TEST_PORT)
-     s.should_not be_nil
-     s.close
-   end .should_not raise_error
+      s = TCPSocket.open('localhost', TEST_PORT)
+      s.should_not be_nil
+      s.close
+    end .to_not raise_error
   end
 end
