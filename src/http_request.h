@@ -73,9 +73,10 @@ void http_request_free(HttpRequest* request);
 // - Will modify the input string
 void http_request_parse(HttpRequest* request, char* text);
 
-// Make room for a new header in the request. Return the new HttpHeader object.
-// - You probably won't need to use this. It's mainly for internal use.
+// Add or remove a header. Acts on the end of the headers array.
+// - You probably won't need to use these. They're mainly for internal use.
 HttpHeader* http_request_add_header(HttpRequest* request);
+void        http_request_pop_header(HttpRequest* request);
 
 // Print an HttpRequest to stdout. For debugging.
 void http_request_print(HttpRequest* request);

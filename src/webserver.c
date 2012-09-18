@@ -78,10 +78,12 @@ void start_server(int port) {
     printf("%s\n", client.data);
     printf("----------------------------------\n");
 
+
     // Parse request, write a response
     HttpRequest request;
     http_request_init(&request);
     http_request_parse(&request, client.data);
+    http_request_print(&request); //TODO
 
     // Do stuff based on request
     // TODO - the meat!!!

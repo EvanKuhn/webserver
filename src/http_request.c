@@ -118,6 +118,13 @@ HttpHeader* http_request_add_header(HttpRequest* request) {
   return &request->headers[request->num_headers - 1];
 }
 
+void http_request_pop_header(HttpRequest* request) {
+  if(request->num_headers > 0) {
+    http_header_free(&request->headers[request->num_headers-1]);
+    request->num_headers -= 1;
+  }
+}
+
 // Parse the HTTP request line
 // Format:  Method SP Request-URI SP HTTP-Version CRLF
 // Example: GET / HTTP/1.1
@@ -160,25 +167,23 @@ bool http_request_parse_request_line(HttpRequest* request, char* line) {
 
 bool http_request_parse_header_line(HttpRequest* request, char* line) {
   char* line_start = line;
-  char* token = NULL;
   HttpHeader* header = http_request_add_header(request);
 
-  // Fetch and store key
-  token = strsep_trim(&line, ":");
-  if(!token) goto failure;
-  http_header_set_key(header, token);
+  // See if we can tokenize the line. If not, bail.
+  const char* key = strsep_trim(&line, ":");
+  if(!key) {
+    fprintf(stderr, "Error parsing HTTP header line %s", line_start);
+    http_request_pop_header(request);
+    return false;
+  }
 
-  // Fetch and store value
-  token = strsep_trim(&line, ":");
-  if(!token) goto failure;
-  http_header_set_value(header, token);
+  // The value is the remainder of the line, trimmed
+  const char* value = trim(line);
+
+  // Store key and value
+  http_header_set_key(header, key);
+  http_header_set_value(header, value);
   return true;
-
-  // If it hits the fan, clean up
-failure:
-  fprintf(stderr, "Error parsing HTTP header line %s", line_start);
-  request->num_headers -= 1;
-  return false;
 }
 
 void http_request_parse(HttpRequest* request, char* text) {
@@ -215,9 +220,6 @@ void http_request_parse(HttpRequest* request, char* text) {
     request->body = malloc(textlen + 1);
     memcpy(request->body, text, textlen + 1);
   }
-
-  // Print the request
-  http_request_print(request); //TODO
 }
 
 void http_request_print(HttpRequest* request) {
