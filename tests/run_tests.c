@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
   if(!msg) msg = test_sockets();
 
   // Print results
-  if(msg) printf("- %s\n\nTEST FAILED\n", msg);
+  if(msg) fprintf(stderr, "- %s\n\nTEST FAILED\n", msg);
   else    printf("\nALL TESTS PASSED\n");
   printf("Tests run: %d\n", tests_run);
 

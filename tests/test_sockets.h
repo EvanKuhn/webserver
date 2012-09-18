@@ -151,25 +151,25 @@ static char* client_socket_recv_test_helper(char* test_message,
 
     status = server_socket_init(&server);
     if(!status.ok) {
-      printf("CHILD ERROR: server_socket_init failed, errno = %i\n", status.errnum);
+      fprintf(stderr, "CHILD ERROR: server_socket_init failed, errno = %i\n", status.errnum);
       exit(0);
     }
 
     status = server_socket_bind(&server, port);
     if(!status.ok) {
-      printf("CHILD ERROR: server_socket_bind to port %i failed, errno = %i\n", port, status.errnum);
+      fprintf(stderr, "CHILD ERROR: server_socket_bind to port %i failed, errno = %i\n", port, status.errnum);
       exit(0);
     }
 
     status = server_socket_set_blocking(&server, false);
     if(!status.ok) {
-      printf("CHILD ERROR: server_socket_set_blocking failed, errno = %i\n", status.errnum);
+      fprintf(stderr, "CHILD ERROR: server_socket_set_blocking failed, errno = %i\n", status.errnum);
       exit(0);
     }
 
     status = server_socket_listen(&server, 5);
     if(!status.ok) {
-      printf("CHILD ERROR: server_socket_listen failed, errno = %i\n", status.errnum);
+      fprintf(stderr, "CHILD ERROR: server_socket_listen failed, errno = %i\n", status.errnum);
       exit(0);
     }
 
@@ -193,7 +193,6 @@ static char* client_socket_recv_test_helper(char* test_message,
     mu_assert("didn't receive all the data from the server", result.ok);
 
     result.ok = (strncmp(test_message, s.data, s.data_len) == 0);
-    //if(!result) printf("- received: %s\n", s.data);
     mu_assert("didn't receive expected string from server", result.ok);
   }
 

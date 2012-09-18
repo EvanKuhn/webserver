@@ -17,14 +17,14 @@ const int MAX_PENDING_CONNS = 100;
 // Check status. On error, print message and return from calling function.
 #define return_on_error(status, errmsg) \
 if(!status.ok) { \
-  printf("%s (errno: %i)\n", errmsg, status.errnum); \
+  fprintf(stderr, "%s (errno: %i)\n", errmsg, status.errnum); \
   return; \
 }
 
 // Check status. On error, print message and continue calling loop.
 #define continue_on_error(status, errmsg) \
 if(!status.ok) { \
-  printf("%s (errno: %i)\n", errmsg, status.errnum); \
+  fprintf(stderr, "%s (errno: %i)\n", errmsg, status.errnum); \
   continue; \
 }
 
@@ -68,25 +68,31 @@ void start_server(int port) {
     status = client_socket_recv(&client);
     continue_on_error(status, "Error reading data from client");
 
-    // Print data received
-    if(client.data) {
-      printf("------------ received ------------\n");
-      printf("%s", client.data);
-      printf("----------------------------------\n");
+    // Check if data received. If not, log an error.
+    if(!client.data) {
+      fprintf(stderr, "Got no data from client\n");
     }
-    else {
-      printf("Got no data from client\n");
-    }
+
+    // TODO - debugging output
+    printf("------------ received ------------\n");
+    printf("%s\n", client.data);
+    printf("----------------------------------\n");
 
     // Parse request, write a response
     HttpRequest request;
     http_request_init(&request);
     http_request_parse(&request, client.data);
-    // etc...
+
+    // Do stuff based on request
+    // TODO - the meat!!!
+
+    // Clean up
     http_request_free(&request);
-
-
-    // Close the client socket
     client_socket_close(&client);
+
+    break; // TODO - for now, just handle one request
   }
+
+  // Close the server socket
+  server_socket_close(&server);
 }

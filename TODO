@@ -1,5 +1,3 @@
-Print all errors to stderr instead of stdout
-
 Get webserver responding to some basic request
 - Test with 'curl'
 - Start with HEAD and GET?
