@@ -6,8 +6,6 @@ const char* safe_cstr(const char* s) {
   return (s ? s : "");
 }
 
-//TODO - we can't modify string literals! Hmm. Copy string and return copy?
-
 char* trim(char* str) {
   // Trim trailing whitespace by adding null terminator
   const size_t len = strlen(str);

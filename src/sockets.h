@@ -29,7 +29,7 @@ void client_socket_init(ClientSocket* s);
 Status client_socket_connect(ClientSocket* s, const char* ip, int port);
 
 // Send data over the client socket
-Status client_socket_send(ClientSocket* s, void* buf, size_t bufsize);
+Status client_socket_send(ClientSocket* s, const void* buf, size_t bufsize);
 
 // Receive data from the socket.
 // - Data will be placed in ClientSocket::data.

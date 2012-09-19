@@ -32,7 +32,7 @@ int get_next_port() {
 //==============================================================================
 // ClientSocket
 //==============================================================================
-static char* test__client_socket_init() {
+const char* test__client_socket_init() {
   puts("test: client_socket_init()");
   ClientSocket s;
   client_socket_init(&s);
@@ -42,7 +42,7 @@ static char* test__client_socket_init() {
   return 0;
 }
 
-static char* test__client_socket_connect() {
+const char* test__client_socket_connect() {
   puts("test: client_socket_connect()");
 
   // Use a different port in this test, because we're going to spawn a subprocess
@@ -84,7 +84,7 @@ static char* test__client_socket_connect() {
   return 0;
 }
 
-static char* test__client_socket_send() {
+const char* test__client_socket_send() {
   puts("test: client_socket_send()");
   const int port = get_next_port();
   Status result = make_status(false, 0);
@@ -124,8 +124,8 @@ static char* test__client_socket_send() {
 }
 
 // Helper function used by recv_test functions
-static char* client_socket_recv_test_helper(char* test_message,
-                                            size_t test_message_len)
+const char* client_socket_recv_test_helper(const char* test_message,
+                                           size_t test_message_len)
 {
   const int port = get_next_port();
   Status result = make_status(false, 0);
@@ -200,18 +200,18 @@ static char* client_socket_recv_test_helper(char* test_message,
   return 0;
 }
 
-static char* test__client_socket_recv_test__short_msg() {
+const char* test__client_socket_recv_test__short_msg() {
   puts("test: client_socket_recv() w/ short message");
 
   // Create a test message
-  char* msg = "hello world!";
-  size_t msglen = strlen(msg);
+  const char* msg = "hello world!";
+  const size_t msglen = strlen(msg);
 
   // Run the test
   return client_socket_recv_test_helper(msg, msglen);
 }
 
-static char* test__client_socket_recv_test__long_msg() {
+const char* test__client_socket_recv_test__long_msg() {
   puts("test: client_socket_recv() w/ long message");
 
   // Create some test data
@@ -221,12 +221,12 @@ static char* test__client_socket_recv_test__long_msg() {
   msg[msglen] = 0;
 
   // Run the test, free the message, and return
-  char* result = client_socket_recv_test_helper(msg, msglen);
+  const char* result = client_socket_recv_test_helper(msg, msglen);
   free(msg);
   return result;
 }
 
-static char* test__client_socket_close() {
+const char* test__client_socket_close() {
   puts("test: client_socket_close()");
   const int port = get_next_port();
   Status result = make_status(false, 0);
@@ -269,7 +269,7 @@ static char* test__client_socket_close() {
 //==============================================================================
 // ServerSocket
 //==============================================================================
-static char* test__server_socket_init() {
+const char* test__server_socket_init() {
   puts("test: server_socket_init()");
   ServerSocket s;
   Status result = server_socket_init(&s);
@@ -282,7 +282,7 @@ static char* test__server_socket_init() {
   return 0;
 }
 
-static char* test__server_socket_bind() {
+const char* test__server_socket_bind() {
   puts("test: server_socket_bind()");
   ServerSocket s;
   server_socket_init(&s);
@@ -293,7 +293,7 @@ static char* test__server_socket_bind() {
   return 0;
 }
 
-static char* test__server_socket_listen() {
+const char* test__server_socket_listen() {
   puts("test: server_socket_listen()");
   ServerSocket s;
   server_socket_init(&s);
@@ -309,7 +309,7 @@ static char* test__server_socket_listen() {
   return 0;
 }
 
-static char* test__server_socket_accept() {
+const char* test__server_socket_accept() {
   puts("test: server_socket_accept()");
   Status result = make_status(false, 0);
   const int port = get_next_port();
@@ -362,7 +362,7 @@ static char* test__server_socket_accept() {
   return 0;
 }
 
-static char* test__server_socket_accept_poll() {
+const char* test__server_socket_accept_poll() {
   puts("test: server_socket_accept_poll()");
   Status result = make_status(false, 0);
   const int port = get_next_port();
@@ -414,7 +414,7 @@ static char* test__server_socket_accept_poll() {
   return 0;
 }
 
-static char* test__server_socket_close() {
+const char* test__server_socket_close() {
   puts("test: server_socket_close()");
   Status result = make_status(false, 0);
 
@@ -438,17 +438,17 @@ static char* test__server_socket_close() {
 //==============================================================================
 // Test-all function
 //==============================================================================
-char* test_sockets() {
+const char* test_sockets() {
   printf("\n");
   mu_run_test(test__client_socket_init);
   mu_run_test(test__client_socket_connect);
   mu_run_test(test__client_socket_send);
   mu_run_test(test__client_socket_recv_test__short_msg);
   mu_run_test(test__client_socket_recv_test__long_msg);
-  if(false) mu_run_test(test__client_socket_close);  //TODO - fails in gdb
+  mu_run_test(test__client_socket_close);  //TODO - fails in gdb
 
   printf("\n");
-  if(false) mu_run_test(test__server_socket_init);  //TODO - fails in gdb
+  mu_run_test(test__server_socket_init);  //TODO - fails in gdb
   mu_run_test(test__server_socket_bind);
   mu_run_test(test__server_socket_listen);
   mu_run_test(test__server_socket_accept);

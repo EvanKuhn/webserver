@@ -12,22 +12,26 @@
 //==============================================================================
 // Utility function tests
 //==============================================================================
-static char* test__safe_cstr() {
+const char* test__safe_cstr() {
   puts("test: test__safe_cstr()");
   mu_assert("didn't return the input string", !strcmp(safe_cstr("asdf"), "asdf"));
   mu_assert("didn't return empty string when given NULL", !strcmp(safe_cstr(NULL), ""));
   return 0;
 }
 
-static char* test__trim() {
+const char* test__trim() {
   puts("test: test__trim()");
-  mu_assert("didn't trim leading spaces",     !strcmp(trim("  foo"), "foo"));
-  mu_assert("didn't trim trailing spaces",    !strcmp(trim("foo  "), "foo"));
-  mu_assert("didn't trim surrounding spaces", !strcmp(trim(" foo "), "foo"));
+  char buf[6];
+  memcpy(buf, "  foo", 6);
+  mu_assert("didn't trim leading spaces", !strcmp(trim(buf), "foo"));
+  memcpy(buf, "foo  ", 6);
+  mu_assert("didn't trim trailing spaces", !strcmp(trim(buf), "foo"));
+  memcpy(buf, " foo ", 6);
+  mu_assert("didn't trim surrounding spaces", !strcmp(trim(buf), "foo"));
   return 0;
 }
 
-static char* test__strsep_trim() {
+const char* test__strsep_trim() {
   puts("test: test__strsep_trim()");
   mu_not_implemented(); //TODO
   return 0;
@@ -36,7 +40,7 @@ static char* test__strsep_trim() {
 //==============================================================================
 // Test-all function
 //==============================================================================
-char* test_utils() {
+const char* test_utils() {
   printf("\n");
   mu_run_test(test__safe_cstr);
   mu_run_test(test__trim);

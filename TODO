@@ -1,7 +1,3 @@
-Need to compile with -Wwrite-strings, so all string literals are const char*.
-- String literals cannot be modified, so they should be const.
-- This way, string-modifying functions won't be able to take string literals.
-
 Change mu_assert(message, test) to mu_assert(test, message, ...)
 - enables printf-style asserts
 

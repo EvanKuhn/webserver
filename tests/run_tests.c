@@ -15,7 +15,7 @@ int tests_run = 0;
 
 int main(int argc, char **argv) {
   // Run all tests
-  char* msg = NULL;
+  const char* msg = NULL;
   if(!msg) msg = test_http_request();
   if(!msg) msg = test_program_options();
   if(!msg) msg = test_sockets();
@@ -29,5 +29,5 @@ int main(int argc, char **argv) {
   //TODO - at end of tests, check for and kill all child processes
 
   // Exit with success or failure
-  return msg != 0;
+  return (msg != 0);
 }

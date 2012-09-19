@@ -15,7 +15,7 @@
 //==============================================================================
 // HTTP enum types
 //==============================================================================
-static char* test__http_version_from_string() {
+const char* test__http_version_from_string() {
   puts("test: http_version_from_string()");
   enum EHttpVersion val = HTTP_VERSION_UNKNOWN;
   val = http_version_from_string("HTTP/1.0");
@@ -27,7 +27,7 @@ static char* test__http_version_from_string() {
   return 0;
 }
 
-static char* test__http_method_from_string() {
+const char* test__http_method_from_string() {
   puts("test: http_method_from_string()");
   enum EHttpMethod val = HTTP_METHOD_UNKNOWN;
   val = http_method_from_string("GET");
@@ -43,7 +43,7 @@ static char* test__http_method_from_string() {
   return 0;
 }
 
-static char* test__http_version_to_string() {
+const char* test__http_version_to_string() {
   puts("test: http_version_to_string()");
   const char* str = NULL;
   str = http_version_to_string(HTTP_VERSION_1_0);
@@ -57,7 +57,7 @@ static char* test__http_version_to_string() {
   return 0;
 }
 
-static char* test__http_method_to_string() {
+const char* test__http_method_to_string() {
   puts("test: http_method_to_string()");
   const char* str = NULL;
   str = http_method_to_string(HTTP_METHOD_GET);
@@ -78,7 +78,7 @@ static char* test__http_method_to_string() {
 //==============================================================================
 // HttpHeader
 //==============================================================================
-static char* test__http_header_init() {
+const char* test__http_header_init() {
   puts("test: http_header_init()");
   HttpHeader h;
   http_header_init(&h);
@@ -87,7 +87,7 @@ static char* test__http_header_init() {
   return 0;
 }
 
-static char* test__http_header_set_key() {
+const char* test__http_header_set_key() {
   puts("test: http_header_set_key()");
   HttpHeader h;
   http_header_init(&h);
@@ -97,7 +97,7 @@ static char* test__http_header_set_key() {
   return 0;
 }
 
-static char* test__http_header_set_value() {
+const char* test__http_header_set_value() {
   puts("test: http_header_set_value()");
   HttpHeader h;
   http_header_init(&h);
@@ -107,7 +107,7 @@ static char* test__http_header_set_value() {
   return 0;
 }
 
-static char* test__http_header_free() {
+const char* test__http_header_free() {
   puts("test: http_header_free()");
   HttpHeader h;
   http_header_init(&h);
@@ -136,7 +136,7 @@ const char* HTTP_REQUEST_STRING =
   "it has multiple lines"
   ;
 
-static char* test__http_request_init() {
+const char* test__http_request_init() {
   puts("test: http_request_init()");
   HttpRequest request;
   http_request_init(&request);
@@ -150,7 +150,7 @@ static char* test__http_request_init() {
   return 0;
 }
 
-static char* test__http_request_parse() {
+const char* test__http_request_parse() {
   puts("test: http_request_parse()");
   HttpRequest request;
   http_request_init(&request);
@@ -176,34 +176,34 @@ static char* test__http_request_parse() {
   return 0;
 }
 
-static char* test__http_request_add_header() {
+const char* test__http_request_add_header() {
   puts("test: http_request_add_header()");
   HttpRequest request;
   http_request_init(&request);
-  //TODO
+  //TODO - write this test
   return 0;
 }
 
-static char* test__http_request_pop_header() {
+const char* test__http_request_pop_header() {
   puts("test: http_request_pop_header()");
   HttpRequest request;
   http_request_init(&request);
-  //TODO
+  //TODO - write this test
   return 0;
 }
 
-static char* test__http_request_free() {
+const char* test__http_request_free() {
   puts("test: http_request_free()");
   HttpRequest request;
   http_request_init(&request);
-  //TODO
+  //TODO - write this test
   return 0;
 }
 
 //==============================================================================
 // Test-all function
 //==============================================================================
-char* test_http_request() {
+const char* test_http_request() {
   printf("\n");
   mu_run_test(test__http_version_from_string);
   mu_run_test(test__http_method_from_string);

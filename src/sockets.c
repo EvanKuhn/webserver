@@ -36,16 +36,32 @@ Status client_socket_connect(ClientSocket* s, const char* ip, int port) {
   s->addr.sin_family = AF_INET;
   s->addr.sin_addr.s_addr = inet_addr(ip);
   s->addr.sin_port = htons(port);
-  const int result = connect(s->fd, (struct sockaddr*)&s->addr, sizeof(s->addr));
-  Status status = get_status(result != -1);
+
+  // All of this crazy code exists because gdb creates interrupts that cause
+  // connect() to fail with errno EINTR. If that happens, we keep trying.
+  // Further, if we get an EINTR followed by EISCONN (interrupt, is-connected),
+  // consider that a success.
+  int result = 0;
+  do {
+    result = connect(s->fd, (struct sockaddr*)&s->addr, sizeof(s->addr));
+    // Try again. If we got an error code of 56 (), say success.
+    if(result == -1 && errno == EINTR) {
+      result = connect(s->fd, (struct sockaddr*)&s->addr, sizeof(s->addr));
+      if(result == -1 && errno == EISCONN) {
+        result = 0;
+      }
+    }
+  }
+  while(result == -1 && errno == EINTR);
 
   // If we failed, reinitialize the socket
+  Status status = get_status(result != -1);
   if(!status.ok) client_socket_init(s);
   return status;
 }
 
 // Send data over the client socket
-Status client_socket_send(ClientSocket* s, void* buf, size_t bufsize) {
+Status client_socket_send(ClientSocket* s, const void* buf, size_t bufsize) {
   const int result = send(s->fd, buf, bufsize, 0);
   return get_status(result != -1);
 }

@@ -6,8 +6,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-// TODO - write tests
-
 // Return the input string, or "" if input is null
 const char* safe_cstr(const char* s);
 
