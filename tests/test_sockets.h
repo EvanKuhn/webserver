@@ -445,10 +445,10 @@ const char* test_sockets() {
   mu_run_test(test__client_socket_send);
   mu_run_test(test__client_socket_recv_test__short_msg);
   mu_run_test(test__client_socket_recv_test__long_msg);
-  mu_run_test(test__client_socket_close);  //TODO - fails in gdb
+  mu_run_test(test__client_socket_close);
 
   printf("\n");
-  mu_run_test(test__server_socket_init);  //TODO - fails in gdb
+  mu_run_test(test__server_socket_init);
   mu_run_test(test__server_socket_bind);
   mu_run_test(test__server_socket_listen);
   mu_run_test(test__server_socket_accept);
