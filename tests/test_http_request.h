@@ -15,7 +15,6 @@
 //==============================================================================
 // HTTP enum types
 //==============================================================================
-
 static char* test__http_version_from_string() {
   puts("test: http_version_from_string()");
   enum EHttpVersion val = HTTP_VERSION_UNKNOWN;
@@ -205,8 +204,6 @@ static char* test__http_request_free() {
 // Test-all function
 //==============================================================================
 char* test_http_request() {
-  char* msg = NULL;
-
   printf("\n");
   mu_run_test(test__http_version_from_string);
   mu_run_test(test__http_method_from_string);
@@ -226,7 +223,7 @@ char* test_http_request() {
   mu_run_test(test__http_request_pop_header);
   mu_run_test(test__http_request_free);
 
-  return msg;
+  return 0;
 }
 
 #endif // TEST_HTTP_REQUEST_H

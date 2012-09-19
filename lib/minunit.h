@@ -12,4 +12,9 @@
     if (message) return message; \
   } while (0)
 
+#define mu_not_implemented() \
+  do { \
+    printf("- NOT IMPLEMENTED\n"); \
+  } while (0)
+
 extern int tests_run;

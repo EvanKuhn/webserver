@@ -55,13 +55,12 @@ static char* test__program_options_parse__supports_help() {
 // Run all tests
 char* test_program_options() {
   silence_program_options_parse = true;
-  char* msg = NULL;
   printf("\n");
   mu_run_test(test__program_options_parse__sets_defaults);
   mu_run_test(test__program_options_parse__parses_port);
   mu_run_test(test__program_options_parse__requires_port_arg);
   mu_run_test(test__program_options_parse__supports_help);
-  return msg;
+  return 0;
 }
 
 #endif // TEST_PROGRAM_OPTIONS_H

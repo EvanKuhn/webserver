@@ -9,6 +9,7 @@
 #include "test_http_request.h"
 #include "test_program_options.h"
 #include "test_sockets.h"
+#include "test_utils.h"
 
 int tests_run = 0;
 
@@ -18,6 +19,7 @@ int main(int argc, char **argv) {
   if(!msg) msg = test_http_request();
   if(!msg) msg = test_program_options();
   if(!msg) msg = test_sockets();
+  if(!msg) msg = test_utils();
 
   // Print results
   if(msg) fprintf(stderr, "- %s\n\nTEST FAILED\n", msg);
