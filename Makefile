@@ -15,7 +15,7 @@ src/status.o: src/status.h
 src/webserver.o: src/webserver.h src/sockets.h src/http_request.h
 src/webserver_main.o: src/program_options.h src/webserver.h
 src/utils.o: src/utils.h
-tests/run_tests.o: $(SOURCES) $(TESTS) lib/minunit.h
+tests/run_tests.o: $(SOURCES) $(TESTS) lib/nu_unit.h
 
 # Executables
 bin/webserver: $(OBJECTS) src/webserver_main.o

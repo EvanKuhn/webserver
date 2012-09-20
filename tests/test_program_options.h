@@ -7,7 +7,7 @@
 #define TEST_PROGRAM_OPTIONS_H
 
 #include <stdlib.h>
-#include "minunit.h"
+#include "nu_unit.h"
 #include "program_options.h"
 
 // Helper function: given an array of strings, free them

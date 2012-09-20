@@ -5,7 +5,7 @@
 //==============================================================================
 #include <stdio.h>
 #include <string.h>
-#include "minunit.h"
+#include "nu_unit.h"
 #include "test_http_request.h"
 #include "test_program_options.h"
 #include "test_sockets.h"

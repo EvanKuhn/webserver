@@ -6,7 +6,7 @@
 #ifndef TEST_HTTP_REQUEST_H
 #define TEST_HTTP_REQUEST_H
 
-#include "minunit.h"
+#include "nu_unit.h"
 #include "http_request.h"
 #include <stdbool.h>
 #include <stdlib.h>

@@ -1,5 +1,5 @@
 //==============================================================================
-// Unit-testing framework based on an extended version of minunit.h
+// Unit-testing framework based on MinUnit.
 //==============================================================================
 #include <stdio.h>
 

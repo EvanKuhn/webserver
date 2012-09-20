@@ -6,7 +6,7 @@
 #ifndef TEST_SOCKETS_H
 #define TEST_SOCKETS_H
 
-#include "minunit.h"
+#include "nu_unit.h"
 #include "sockets.h"
 #include <errno.h>
 #include <stdbool.h>

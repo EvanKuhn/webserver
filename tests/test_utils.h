@@ -6,7 +6,7 @@
 #ifndef TEST_UTILS_H
 #define TEST_UTILS_H
 
-#include "minunit.h"
+#include "nu_unit.h"
 #include "utils.h"
 
 //==============================================================================
