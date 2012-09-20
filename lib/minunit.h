@@ -15,29 +15,56 @@ extern int mu_tests_not_impl;
   int mu_tests_not_impl = 0
 
 // Assert something is true. If not, return the error message.
-#define mu_assert(message, test) \
+#define mu_assert(msg, test) \
   do { \
-    if (!(test)) return message; \
+    if(!(test)) { \
+      printf("- %s\n", msg); \
+      ++mu_tests_failed; \
+      return; \
+    } \
   } while(0)
 
-// Run a test and increment the tests_run counter
+// Fail with the given error message. Causes the current function to return.
+#define mu_fail(msg) \
+  do { \
+    printf("- %s\n", msg); \
+    ++mu_tests_failed; \
+    return; \
+  } while(0)
+
+// Run a test function. Return from the calling function if the test fails.
 #define mu_run_test(test) \
   do { \
-    const char *msg = test(); \
-    if(msg) { ++mu_tests_failed; return msg; } \
-    else    { ++mu_tests_passed; } \
+    if(!mu_tests_failed) { \
+      test(); \
+      if(mu_tests_failed) return; \
+      ++mu_tests_passed; \
+    } \
   } while(0)
 
-// Print a message and increment tests_skipped counter
+// Run a test suite function. Skip the suite if a previous test failed.
+#define mu_run_suite(suite) \
+  do { \
+    if(!mu_tests_failed) { \
+      printf("\n"); \
+      suite(); \
+    } \
+  } while(0)
+
+// Print a message and increment not-implemented counter
 #define mu_not_implemented() \
-  ++mu_tests_not_impl; \
-  printf("- test not implemented\n")
+  do { \
+    ++mu_tests_not_impl; \
+    printf("- test not implemented\n"); \
+  } while(0)
 
 // Print a summary of tests. Takes the error message returned from the tests.
-#define mu_print_summary(msg) \
+#define mu_print_summary() \
   do { \
-    if(msg) printf("- %s\n", msg); \
     printf("\nSummary: %i passed, %i failed, %i not implemented\n", \
       mu_tests_passed, mu_tests_failed, mu_tests_not_impl); \
-    printf(msg ? "FAILURE\n" : "SUCCESS\n"); \
+    printf(mu_tests_failed ? "FAILURE\n" : "SUCCESS\n"); \
   } while(0)
+
+#define mu_return_status() \
+  (mu_tests_failed ? 1 : 0)
