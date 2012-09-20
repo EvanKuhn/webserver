@@ -17,6 +17,12 @@ void test_bat() {
   nu_not_implemented();
 }
 
+void test_cake() {
+  int cake = 0;
+  int healthy = 1;
+  nu_assert("cake should be healthy", cake == healthy);
+}
+
 //==============================================================================
 // Test suites
 //==============================================================================
@@ -29,6 +35,7 @@ void test_suite1() {
 void test_suite2() {
   nu_run_test(test_foo, "foo");
   nu_run_test(test_bar, "bar");
+  nu_run_test(test_cake, "cake");
 }
 
 //==============================================================================

@@ -18,7 +18,7 @@ extern int nu_tests_not_impl;
 #define nu_assert(msg, test) \
   do { \
     if(!(test)) { \
-      printf("- %s\n", msg); \
+      printf("- %s:%i assert failed: %s\n", __FILE__, __LINE__, msg); \
       ++nu_tests_failed; \
       return; \
     } \

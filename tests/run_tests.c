@@ -27,5 +27,3 @@ int main(int argc, char **argv) {
   nu_print_summary();
   return nu_return_status();
 }
-
-  //TODO - at end of tests, check for and kill all child processes

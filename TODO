@@ -1,5 +1,9 @@
-Change mu_assert(message, test) to mu_assert(test, message, ...)
+Upload nu_unit to github
+
+Change nu_assert(message, test) to mu_assert(test, message, ...)
 - enables printf-style asserts
+
+At end of tests, check for and kill all child processes
 
 Get webserver responding to some basic request
 - Test with 'curl'
@@ -12,5 +16,3 @@ We will need a config file to house settings:
 - MAX_PENDING_CONNS
 - CLIENT_SOCKET_RECV_BUFFER_SIZE
 - ...
-
-
