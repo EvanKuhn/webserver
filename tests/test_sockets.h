@@ -30,21 +30,17 @@ int get_next_port() {
 }
 
 //==============================================================================
-// ClientSocket
+// ClientSocket tests
 //==============================================================================
-const char* test__client_socket_init() {
-  puts("test: client_socket_init()");
+void test__client_socket_init() {
   ClientSocket s;
   client_socket_init(&s);
   mu_assert("failed to initialize the file descriptor", s.fd == -1);
   mu_assert("failed to initialize the data pointer", s.data == 0);
   mu_assert("failed to initialize the data length", s.data_len == 0);
-  return 0;
 }
 
-const char* test__client_socket_connect() {
-  puts("test: client_socket_connect()");
-
+void test__client_socket_connect() {
   // Use a different port in this test, because we're going to spawn a subprocess
   // that'll stick around for a while and use that port.
   const int port = get_next_port();
@@ -81,11 +77,9 @@ const char* test__client_socket_connect() {
   }
 
   client_socket_close(&s);
-  return 0;
 }
 
-const char* test__client_socket_send() {
-  puts("test: client_socket_send()");
+void test__client_socket_send() {
   const int port = get_next_port();
   Status result = make_status(false, 0);
 
@@ -120,13 +114,10 @@ const char* test__client_socket_send() {
   }
 
   client_socket_close(&s);
-  return 0;
 }
 
 // Helper function used by recv_test functions
-const char* client_socket_recv_test_helper(const char* test_message,
-                                           size_t test_message_len)
-{
+void client_socket_recv_test_helper(const char* msg, size_t msg_len) {
   const int port = get_next_port();
   Status result = make_status(false, 0);
 
@@ -174,7 +165,7 @@ const char* client_socket_recv_test_helper(const char* test_message,
     }
 
     if(server_socket_accept_poll(&server, &client, 250, 5000).ok) {
-      client_socket_send(&client, test_message, test_message_len);
+      client_socket_send(&client, msg, msg_len);
     }
     client_socket_close(&client);
     server_socket_close(&server);
@@ -189,31 +180,23 @@ const char* client_socket_recv_test_helper(const char* test_message,
     result = client_socket_recv(&s);
     mu_assert("didn't receive data from server", result.ok);
 
-    result.ok = (s.data_len >= test_message_len);
+    result.ok = (s.data_len >= msg_len);
     mu_assert("didn't receive all the data from the server", result.ok);
 
-    result.ok = (strncmp(test_message, s.data, s.data_len) == 0);
+    result.ok = (strncmp(msg, s.data, s.data_len) == 0);
     mu_assert("didn't receive expected string from server", result.ok);
   }
 
   client_socket_close(&s);
-  return 0;
 }
 
-const char* test__client_socket_recv_test__short_msg() {
-  puts("test: client_socket_recv() w/ short message");
-
-  // Create a test message
+void test__client_socket_recv__short() {
   const char* msg = "hello world!";
   const size_t msglen = strlen(msg);
-
-  // Run the test
-  return client_socket_recv_test_helper(msg, msglen);
+  client_socket_recv_test_helper(msg, msglen);
 }
 
-const char* test__client_socket_recv_test__long_msg() {
-  puts("test: client_socket_recv() w/ long message");
-
+void test__client_socket_recv__long() {
   // Create some test data
   const size_t msglen = 2047;
   char* msg = malloc(msglen + 1);
@@ -221,13 +204,11 @@ const char* test__client_socket_recv_test__long_msg() {
   msg[msglen] = 0;
 
   // Run the test, free the message, and return
-  const char* result = client_socket_recv_test_helper(msg, msglen);
+  client_socket_recv_test_helper(msg, msglen);
   free(msg);
-  return result;
 }
 
-const char* test__client_socket_close() {
-  puts("test: client_socket_close()");
+void test__client_socket_close() {
   const int port = get_next_port();
   Status result = make_status(false, 0);
 
@@ -262,15 +243,12 @@ const char* test__client_socket_close() {
   result = client_socket_close(&s);
   mu_assert("should succeed with connected socket", result.ok);
   mu_assert("should set socket file descriptor to -1", s.fd == -1);
-
-  return 0;
 }
 
 //==============================================================================
-// ServerSocket
+// ServerSocket tests
 //==============================================================================
-const char* test__server_socket_init() {
-  puts("test: server_socket_init()");
+void test__server_socket_init() {
   ServerSocket s;
   Status result = server_socket_init(&s);
   mu_assert("returned false", result.ok);
@@ -279,22 +257,18 @@ const char* test__server_socket_init() {
   mu_assert("failed to set the in-address", s.addr.sin_addr.s_addr == INADDR_ANY);
   mu_assert("failed to set port to 0", s.addr.sin_port == 0);
   server_socket_close(&s);
-  return 0;
 }
 
-const char* test__server_socket_bind() {
-  puts("test: server_socket_bind()");
+void test__server_socket_bind() {
   ServerSocket s;
   server_socket_init(&s);
   Status result = server_socket_bind(&s, 8000);
   mu_assert("returned false", result.ok);
   mu_assert("failed to set the port", s.addr.sin_port == htons(8000));
   server_socket_close(&s);
-  return 0;
 }
 
-const char* test__server_socket_listen() {
-  puts("test: server_socket_listen()");
+void test__server_socket_listen() {
   ServerSocket s;
   server_socket_init(&s);
 
@@ -306,11 +280,9 @@ const char* test__server_socket_listen() {
   mu_assert("failed with bound socket", result.ok);
 
   server_socket_close(&s);
-  return 0;
 }
 
-const char* test__server_socket_accept() {
-  puts("test: server_socket_accept()");
+void test__server_socket_accept() {
   Status result = make_status(false, 0);
   const int port = get_next_port();
 
@@ -359,11 +331,9 @@ const char* test__server_socket_accept() {
   }
 
   server_socket_close(&s);
-  return 0;
 }
 
-const char* test__server_socket_accept_poll() {
-  puts("test: server_socket_accept_poll()");
+void test__server_socket_accept_poll() {
   Status result = make_status(false, 0);
   const int port = get_next_port();
   const int interval = 100;
@@ -411,11 +381,9 @@ const char* test__server_socket_accept_poll() {
   }
 
   server_socket_close(&s);
-  return 0;
 }
 
-const char* test__server_socket_close() {
-  puts("test: server_socket_close()");
+void test__server_socket_close() {
   Status result = make_status(false, 0);
 
   ServerSocket s;
@@ -431,31 +399,27 @@ const char* test__server_socket_close() {
   result = server_socket_close(&s);
   mu_assert("should succeed with listening socket", result.ok);
   mu_assert("failed to reset file descriptor to -1 (c)", s.fd == -1);
-
-  return 0;
 }
 
 //==============================================================================
-// Test-all function
+// Test suites
 //==============================================================================
-const char* test_sockets() {
-  printf("\n");
-  mu_run_test(test__client_socket_init);
-  mu_run_test(test__client_socket_connect);
-  mu_run_test(test__client_socket_send);
-  mu_run_test(test__client_socket_recv_test__short_msg);
-  mu_run_test(test__client_socket_recv_test__long_msg);
-  mu_run_test(test__client_socket_close);
+void test_suite__client_socket() {
+  mu_run_test(test__client_socket_init,        "client_socket_init()");
+  mu_run_test(test__client_socket_connect,     "client_socket_connect()");
+  mu_run_test(test__client_socket_send,        "client_socket_send()");
+  mu_run_test(test__client_socket_recv__short, "client_socket_recv() w/ short message");
+  mu_run_test(test__client_socket_recv__long,  "client_socket_recv() w/ long message");
+  mu_run_test(test__client_socket_close,       "client_socket_close()");
+}
 
-  printf("\n");
-  mu_run_test(test__server_socket_init);
-  mu_run_test(test__server_socket_bind);
-  mu_run_test(test__server_socket_listen);
-  mu_run_test(test__server_socket_accept);
-  mu_run_test(test__server_socket_accept_poll);
-  mu_run_test(test__server_socket_close);
-
-  return 0;
+void test_suite__server_socket() {
+  mu_run_test(test__server_socket_init,        "server_socket_init()");
+  mu_run_test(test__server_socket_bind,        "server_socket_bind()");
+  mu_run_test(test__server_socket_listen,      "server_socket_listen()");
+  mu_run_test(test__server_socket_accept,      "server_socket_accept()");
+  mu_run_test(test__server_socket_accept_poll, "server_socket_accept_poll()");
+  mu_run_test(test__server_socket_close,       "server_socket_close()");
 }
 
 #endif // TEST_SOCKETS_H

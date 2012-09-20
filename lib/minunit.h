@@ -32,21 +32,22 @@ extern int mu_tests_not_impl;
     return; \
   } while(0)
 
-// Run a test function. Return from the calling function if the test fails.
-#define mu_run_test(test) \
+// Run a test. Return from the calling function if the test fails.
+#define mu_run_test(test, name) \
   do { \
     if(!mu_tests_failed) { \
+      printf("test: %s\n", name); \
       test(); \
       if(mu_tests_failed) return; \
       ++mu_tests_passed; \
     } \
   } while(0)
 
-// Run a test suite function. Skip the suite if a previous test failed.
-#define mu_run_suite(suite) \
+// Run a test suite. Skip the suite if a previous test failed.
+#define mu_run_suite(suite, name) \
   do { \
     if(!mu_tests_failed) { \
-      printf("\n"); \
+      printf("\nsuite: %s\n", name); \
       suite(); \
     } \
   } while(0)

@@ -14,18 +14,18 @@
 mu_init();
 
 int main(int argc, char **argv) {
-  // Run all tests
-  const char* msg = NULL;
-  if(!msg) msg = test_http_request();
-  if(!msg) msg = test_program_options();
-  if(!msg) msg = test_sockets();
-  if(!msg) msg = test_utils();
+  // Run all test suites
+  mu_run_suite(test_suite__http_enums,      "HTTP Enums");
+  mu_run_suite(test_suite__http_header,     "HttpHeader");
+  mu_run_suite(test_suite__http_request,    "HttpRequest");
+  mu_run_suite(test_suite__program_options, "ProgramOptions");
+  mu_run_suite(test_suite__client_socket,  "ClientSocket");
+  mu_run_suite(test_suite__server_socket,  "ServerSocket");
+  mu_run_suite(test_suite__utils,           "Utils");
 
-  // Print results
-  mu_print_summary(msg);
-
-  // Exit with success or failure
-  return (msg != 0);
+  // Print results and return
+  mu_print_summary();
+  return mu_return_status();
 }
 
   //TODO - at end of tests, check for and kill all child processes
