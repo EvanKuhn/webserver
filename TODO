@@ -1,7 +1,10 @@
-Upload nu_unit to github
-
-Change nu_assert(message, test) to mu_assert(test, message, ...)
-- enables printf-style asserts
+nu_unit
+- support verbose and non-verbose modes
+- support different error types:
+  - nu_check() just logs a failure, but the test continues
+  - nu_assert() logs a failure and causes the current test to exit
+  - nu_assert_or_die() logs a failure and causes all testing to stop
+- upload to github
 
 At end of tests, check for and kill all child processes
 
