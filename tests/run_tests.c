@@ -11,7 +11,7 @@
 #include "test_sockets.h"
 #include "test_utils.h"
 
-int tests_run = 0;
+mu_init();
 
 int main(int argc, char **argv) {
   // Run all tests
@@ -22,12 +22,10 @@ int main(int argc, char **argv) {
   if(!msg) msg = test_utils();
 
   // Print results
-  if(msg) fprintf(stderr, "- %s\n\nTEST FAILED\n", msg);
-  else    printf("\nALL TESTS PASSED\n");
-  printf("Tests run: %d\n", tests_run);
-
-  //TODO - at end of tests, check for and kill all child processes
+  mu_print_summary(msg);
 
   // Exit with success or failure
   return (msg != 0);
 }
+
+  //TODO - at end of tests, check for and kill all child processes
