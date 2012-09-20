@@ -35,9 +35,9 @@ int get_next_port() {
 void test__client_socket_init() {
   ClientSocket s;
   client_socket_init(&s);
-  mu_assert("failed to initialize the file descriptor", s.fd == -1);
-  mu_assert("failed to initialize the data pointer", s.data == 0);
-  mu_assert("failed to initialize the data length", s.data_len == 0);
+  nu_assert("failed to initialize the file descriptor", s.fd == -1);
+  nu_assert("failed to initialize the data pointer", s.data == 0);
+  nu_assert("failed to initialize the data length", s.data_len == 0);
 }
 
 void test__client_socket_connect() {
@@ -50,15 +50,15 @@ void test__client_socket_connect() {
   client_socket_init(&s);
 
   result = client_socket_connect(&s, "localhost", port);
-  mu_assert("should fail if no server is listening", !result.ok);
-  mu_assert("should reset file descriptor on failure", s.fd == -1);
+  nu_assert("should fail if no server is listening", !result.ok);
+  nu_assert("should reset file descriptor on failure", s.fd == -1);
 
   // Test accepting a connection by forking a new process and starting a server
   // socket listening from the child process
   pid_t pid = fork();
   if(pid < 0) {
     perror("Unable to fork during testing");
-    mu_assert("should fork successfully during testing", false);
+    nu_assert("should fork successfully during testing", false);
   }
   else if(pid == 0) {
     // Child process: open a server socket
@@ -73,7 +73,7 @@ void test__client_socket_connect() {
     // Parent process: open connection to server
     usleep(100 * 1000); // Wait a bit for server socket to listen
     result = client_socket_connect(&s, LOCALHOST, port);
-    mu_assert("failed to connect to server socket", result.ok);
+    nu_assert("failed to connect to server socket", result.ok);
   }
 
   client_socket_close(&s);
@@ -87,13 +87,13 @@ void test__client_socket_send() {
   client_socket_init(&s);
 
   result = client_socket_send(&s, "asdf", 4);
-  mu_assert("sending over an unconnected socket shouldn't succeed", !result.ok);
+  nu_assert("sending over an unconnected socket shouldn't succeed", !result.ok);
 
   // Test sending by forking a server process and sending to it
   pid_t pid = fork();
   if(pid < 0) {
     perror("Unable to fork during testing");
-    mu_assert("should fork successfully during testing", false);
+    nu_assert("should fork successfully during testing", false);
   }
   else if(pid == 0) {
     // Child process: open a server socket
@@ -108,9 +108,9 @@ void test__client_socket_send() {
     // Parent process: open connection to server
     usleep(100 * 1000); // Wait a bit for server socket to listen
     result = client_socket_connect(&s, LOCALHOST, port);
-    mu_assert("failed to connect to server socket", result.ok);
+    nu_assert("failed to connect to server socket", result.ok);
     result = client_socket_send(&s, "asdf", 4);
-    mu_assert("failed to send data to the server", result.ok);
+    nu_assert("failed to send data to the server", result.ok);
   }
 
   client_socket_close(&s);
@@ -126,12 +126,12 @@ void client_socket_recv_test_helper(const char* msg, size_t msg_len) {
   client_socket_init(&s);
 
   result = client_socket_recv(&s);
-  mu_assert("receiving on an unconnected socket shouldn't succeed", !result.ok);
+  nu_assert("receiving on an unconnected socket shouldn't succeed", !result.ok);
 
   pid_t pid = fork();
   if(pid < 0) {
     perror("Unable to fork during testing");
-    mu_assert("should fork successfully during testing", false);
+    nu_assert("should fork successfully during testing", false);
   }
   else if(pid == 0) {
     // Child process: open a server, accept a connection, and send something
@@ -175,16 +175,16 @@ void client_socket_recv_test_helper(const char* msg, size_t msg_len) {
     // Parent process: accept connection and read data
     usleep(100 * 1000);
     result = client_socket_connect(&s, LOCALHOST, port);
-    mu_assert("couldn't connect to server", result.ok);
+    nu_assert("couldn't connect to server", result.ok);
 
     result = client_socket_recv(&s);
-    mu_assert("didn't receive data from server", result.ok);
+    nu_assert("didn't receive data from server", result.ok);
 
     result.ok = (s.data_len >= msg_len);
-    mu_assert("didn't receive all the data from the server", result.ok);
+    nu_assert("didn't receive all the data from the server", result.ok);
 
     result.ok = (strncmp(msg, s.data, s.data_len) == 0);
-    mu_assert("didn't receive expected string from server", result.ok);
+    nu_assert("didn't receive expected string from server", result.ok);
   }
 
   client_socket_close(&s);
@@ -215,20 +215,20 @@ void test__client_socket_close() {
   // Set up a server socket to accept connections
   ServerSocket server;
   result = server_socket_init(&server);
-  mu_assert("failed to initialize server socket for test", result.ok);
+  nu_assert("failed to initialize server socket for test", result.ok);
 
   result = server_socket_bind(&server, port);
-  mu_assert("failed to bind server socket for test", result.ok);
+  nu_assert("failed to bind server socket for test", result.ok);
 
   result = server_socket_listen(&server, 5);
-  mu_assert("failed to set server socket to listen", result.ok);
+  nu_assert("failed to set server socket to listen", result.ok);
 
   // Now we can start testing
   ClientSocket s;
   client_socket_init(&s);
 
   result = client_socket_close(&s);
-  mu_assert("should fail with unconnected socket", !result.ok);
+  nu_assert("should fail with unconnected socket", !result.ok);
 
   // Set up some fake data
   s.data = malloc(5);
@@ -237,12 +237,12 @@ void test__client_socket_close() {
 
   result = client_socket_connect(&s, LOCALHOST, port);
   if(!result.ok) printf("- errno: %i\n", result.errnum);
-  mu_assert("connect should succeed", result.ok);
-  mu_assert("socket file descriptor should not equal -1", s.fd != -1);
+  nu_assert("connect should succeed", result.ok);
+  nu_assert("socket file descriptor should not equal -1", s.fd != -1);
 
   result = client_socket_close(&s);
-  mu_assert("should succeed with connected socket", result.ok);
-  mu_assert("should set socket file descriptor to -1", s.fd == -1);
+  nu_assert("should succeed with connected socket", result.ok);
+  nu_assert("should set socket file descriptor to -1", s.fd == -1);
 }
 
 //==============================================================================
@@ -251,11 +251,11 @@ void test__client_socket_close() {
 void test__server_socket_init() {
   ServerSocket s;
   Status result = server_socket_init(&s);
-  mu_assert("returned false", result.ok);
-  mu_assert("failed to set the file descriptor", s.fd != 0);
-  mu_assert("failed to set the socket address family", s.addr.sin_family == AF_INET);
-  mu_assert("failed to set the in-address", s.addr.sin_addr.s_addr == INADDR_ANY);
-  mu_assert("failed to set port to 0", s.addr.sin_port == 0);
+  nu_assert("returned false", result.ok);
+  nu_assert("failed to set the file descriptor", s.fd != 0);
+  nu_assert("failed to set the socket address family", s.addr.sin_family == AF_INET);
+  nu_assert("failed to set the in-address", s.addr.sin_addr.s_addr == INADDR_ANY);
+  nu_assert("failed to set port to 0", s.addr.sin_port == 0);
   server_socket_close(&s);
 }
 
@@ -263,8 +263,8 @@ void test__server_socket_bind() {
   ServerSocket s;
   server_socket_init(&s);
   Status result = server_socket_bind(&s, 8000);
-  mu_assert("returned false", result.ok);
-  mu_assert("failed to set the port", s.addr.sin_port == htons(8000));
+  nu_assert("returned false", result.ok);
+  nu_assert("failed to set the port", s.addr.sin_port == htons(8000));
   server_socket_close(&s);
 }
 
@@ -273,11 +273,11 @@ void test__server_socket_listen() {
   server_socket_init(&s);
 
   Status result = server_socket_listen(&s, 10);
-  mu_assert("should fail with unbound socket", !result.ok);
+  nu_assert("should fail with unbound socket", !result.ok);
 
   server_socket_bind(&s, 8000);
   result = server_socket_listen(&s, 10);
-  mu_assert("failed with bound socket", result.ok);
+  nu_assert("failed with bound socket", result.ok);
 
   server_socket_close(&s);
 }
@@ -292,28 +292,28 @@ void test__server_socket_accept() {
   server_socket_init(&s);
 
   result = server_socket_set_blocking(&s, false);
-  mu_assert("failed to set server socket non-blocking", result.ok);
+  nu_assert("failed to set server socket non-blocking", result.ok);
 
   result = server_socket_accept(&s, &c);
-  mu_assert("should fail with unbound socket", !result.ok);
+  nu_assert("should fail with unbound socket", !result.ok);
 
   server_socket_bind(&s, port);
   result = server_socket_accept(&s, &c);
-  mu_assert("should fail with non-listening socket", !result.ok);
+  nu_assert("should fail with non-listening socket", !result.ok);
 
   server_socket_listen(&s, 1);
   result = server_socket_accept(&s, &c);
 
   bool ok = (!result.ok && result.errnum == EWOULDBLOCK);
-  mu_assert("should fail with no pending connections", ok);
-  mu_assert("shouldn't set client connection file descriptor", c.fd == -1);
+  nu_assert("should fail with no pending connections", ok);
+  nu_assert("shouldn't set client connection file descriptor", c.fd == -1);
 
   // Test accepting a connection by forking a new process and initiating a
   // client connection from that process.
   pid_t pid = fork();
   if(pid < 0) {
     perror("Unable to fork during testing");
-    mu_assert("should fork successfully during testing", false);
+    nu_assert("should fork successfully during testing", false);
   }
   else if(pid == 0) {
     // Child process: open a connection to the server
@@ -326,8 +326,8 @@ void test__server_socket_accept() {
     // Parent process: wait for child to attemp connection, then accept
     usleep(100 * 1000);
     result = server_socket_accept(&s, &c);
-    mu_assert("didn't accept a pending connection", result.ok);
-    mu_assert("didn't set the client's file descriptor", c.fd != -1);
+    nu_assert("didn't accept a pending connection", result.ok);
+    nu_assert("didn't set the client's file descriptor", c.fd != -1);
   }
 
   server_socket_close(&s);
@@ -346,24 +346,24 @@ void test__server_socket_accept_poll() {
   server_socket_set_blocking(&s, false);
 
   result = server_socket_accept_poll(&s, &c, interval, timeout);
-  mu_assert("should fail with unbound socket", !result.ok);
+  nu_assert("should fail with unbound socket", !result.ok);
 
   server_socket_bind(&s, port);
   result = server_socket_accept_poll(&s, &c, interval, timeout);
-  mu_assert("should fail with non-listening socket", !result.ok);
+  nu_assert("should fail with non-listening socket", !result.ok);
 
   server_socket_listen(&s, 1);
   result = server_socket_accept_poll(&s, &c, interval, timeout);
   bool ok = (!result.ok && result.errnum == EWOULDBLOCK);
-  mu_assert("should fail with no pending connections", ok);
-  mu_assert("shouldn't set client connection file descriptor", c.fd == -1);
+  nu_assert("should fail with no pending connections", ok);
+  nu_assert("shouldn't set client connection file descriptor", c.fd == -1);
 
   // Test accepting a connection by forking a new process and initiating a
   // client connection from that process.
   pid_t pid = fork();
   if(pid < 0) {
     perror("Unable to fork during testing");
-    mu_assert("should fork successfully during testing", false);
+    nu_assert("should fork successfully during testing", false);
   }
   else if(pid == 0) {
     // Child process: wait a bit, then open a connection to the server
@@ -376,8 +376,8 @@ void test__server_socket_accept_poll() {
   else {
     // Parent process: poll for child process
     result = server_socket_accept_poll(&s, &c, interval, timeout);
-    mu_assert("didn't accept a pending connection", result.ok);
-    mu_assert("didn't set the client's file descriptor", c.fd != -1);
+    nu_assert("didn't accept a pending connection", result.ok);
+    nu_assert("didn't set the client's file descriptor", c.fd != -1);
   }
 
   server_socket_close(&s);
@@ -390,36 +390,36 @@ void test__server_socket_close() {
   server_socket_init(&s);
 
   result = server_socket_close(&s);
-  mu_assert("should succeed with initialized socket", result.ok);
-  mu_assert("failed to reset file descriptor to -1 (b)", s.fd == -1);
+  nu_assert("should succeed with initialized socket", result.ok);
+  nu_assert("failed to reset file descriptor to -1 (b)", s.fd == -1);
 
   server_socket_init(&s);
   server_socket_bind(&s, 8000);
   server_socket_listen(&s, 1);
   result = server_socket_close(&s);
-  mu_assert("should succeed with listening socket", result.ok);
-  mu_assert("failed to reset file descriptor to -1 (c)", s.fd == -1);
+  nu_assert("should succeed with listening socket", result.ok);
+  nu_assert("failed to reset file descriptor to -1 (c)", s.fd == -1);
 }
 
 //==============================================================================
 // Test suites
 //==============================================================================
 void test_suite__client_socket() {
-  mu_run_test(test__client_socket_init,        "client_socket_init()");
-  mu_run_test(test__client_socket_connect,     "client_socket_connect()");
-  mu_run_test(test__client_socket_send,        "client_socket_send()");
-  mu_run_test(test__client_socket_recv__short, "client_socket_recv() w/ short message");
-  mu_run_test(test__client_socket_recv__long,  "client_socket_recv() w/ long message");
-  mu_run_test(test__client_socket_close,       "client_socket_close()");
+  nu_run_test(test__client_socket_init,        "client_socket_init()");
+  nu_run_test(test__client_socket_connect,     "client_socket_connect()");
+  nu_run_test(test__client_socket_send,        "client_socket_send()");
+  nu_run_test(test__client_socket_recv__short, "client_socket_recv() w/ short message");
+  nu_run_test(test__client_socket_recv__long,  "client_socket_recv() w/ long message");
+  nu_run_test(test__client_socket_close,       "client_socket_close()");
 }
 
 void test_suite__server_socket() {
-  mu_run_test(test__server_socket_init,        "server_socket_init()");
-  mu_run_test(test__server_socket_bind,        "server_socket_bind()");
-  mu_run_test(test__server_socket_listen,      "server_socket_listen()");
-  mu_run_test(test__server_socket_accept,      "server_socket_accept()");
-  mu_run_test(test__server_socket_accept_poll, "server_socket_accept_poll()");
-  mu_run_test(test__server_socket_close,       "server_socket_close()");
+  nu_run_test(test__server_socket_init,        "server_socket_init()");
+  nu_run_test(test__server_socket_bind,        "server_socket_bind()");
+  nu_run_test(test__server_socket_listen,      "server_socket_listen()");
+  nu_run_test(test__server_socket_accept,      "server_socket_accept()");
+  nu_run_test(test__server_socket_accept_poll, "server_socket_accept_poll()");
+  nu_run_test(test__server_socket_close,       "server_socket_close()");
 }
 
 #endif // TEST_SOCKETS_H
