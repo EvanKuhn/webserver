@@ -1,5 +1,5 @@
 //==============================================================================
-// Unit-testing framework based on MinUnit.
+// nu_unit: C unit-testing framework based on MinUnit
 //==============================================================================
 #include <stdio.h>
 
