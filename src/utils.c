@@ -26,6 +26,8 @@ char* strsep_trim(char** str, const char* delims) {
   // Tokenize
   char* token = strsep(str, delims);
 
+  //TODO - can we use trim() here??
+
   // Trim
   if(token) {
     // Trim left

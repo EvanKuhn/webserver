@@ -1,6 +1,9 @@
 //==============================================================================
 // nu_unit: C unit-testing framework based on MinUnit
 //==============================================================================
+#ifndef NU_UNIT_H
+#define NU_UNIT_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -106,3 +109,5 @@ extern char nu_output_level;
 // Exit with success or failure depending on the number of failures
 #define nu_exit() \
   exit(nu_num_failures ? 1 : 0)
+
+#endif // NU_UNIT_H

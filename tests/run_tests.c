@@ -3,8 +3,6 @@
 //
 // Evan Kuhn 2012-09-09
 //==============================================================================
-#include <stdio.h>
-#include <string.h>
 #include "nu_unit.h"
 #include "test_http_request.h"
 #include "test_program_options.h"
