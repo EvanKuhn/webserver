@@ -14,6 +14,8 @@
 nu_init();
 
 int main(int argc, char **argv) {
+  nu_output_level_suites();
+
   // Run all test suites
   nu_run_suite(test_suite__http_enums,      "HTTP Enums");
   nu_run_suite(test_suite__http_header,     "HttpHeader");
@@ -25,5 +27,5 @@ int main(int argc, char **argv) {
 
   // Print results and return
   nu_print_summary();
-  return nu_return_status();
+  nu_exit();
 }
