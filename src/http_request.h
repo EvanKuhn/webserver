@@ -60,12 +60,13 @@ typedef struct HttpRequest {
   enum EHttpMethod  method;       // HTTP method
   char*             uri;          // URI of resource
   size_t            num_headers;  // Number of headers
-  size_t            header_cap;  // Header array capacity
+  size_t            header_cap;   // Header array capacity
   HttpHeader*       headers;      // Array of headers
   char*             body;         // Request body
 } HttpRequest;
 
 // Initialize or free the struct's fields
+// - 'free' will free the uri, headers, and body, then reinitialize all fields
 void http_request_init(HttpRequest* request);
 void http_request_free(HttpRequest* request);
 

@@ -1,7 +1,8 @@
 nu_unit
-- ability to provide command-line args? (ie. for output level)
-- write README
-- use as submodule (?) in webserver
+- ability to provide command-line args
+  - for output level:  -l/level <t,test,s,suite>
+  - to run one suite:  -s/--suite <suite>
+  - for help:          -h, --help
 
 We will need a config file to house settings:
 - MAX_PENDING_CONNS
@@ -9,6 +10,8 @@ We will need a config file to house settings:
 - ...
 
 At end of tests, check for and kill all child processes
+
+Set up Rakefile and rspec tests
 
 Get webserver responding to some basic request
 - Test with 'curl'

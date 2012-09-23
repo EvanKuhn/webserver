@@ -12,10 +12,7 @@ const char* safe_cstr(const char* s);
 // Trim surrounding whitespace from the string.
 // - Adds a new null-separator to remove trailing whitespace.
 // - Returns a pointer to the first character after leading whitespace.
+// - Returns NULL if input is NULL.
 char* trim(char* str);
-
-// A version of strsep() that also trims each token of surrounding whitespace.
-// See 'man strsep' for usage details.
-char* strsep_trim(char** str, const char* delims);
 
 #endif // UTILS_H

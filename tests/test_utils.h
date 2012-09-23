@@ -27,24 +27,12 @@ void test__trim() {
   nu_check("didn't trim surrounding spaces", !strcmp(trim(buf), "foo"));
 }
 
-void test__strsep_trim() {
-  nu_not_implemented();
-  char buf[128];
-  bzero(buf, 128);
-
-  // read 'man strsep' for details on what to test
-  // empty string
-  // internal spaces
-  // external spaces
-}
-
 //==============================================================================
 // Test suites
 //==============================================================================
 void test_suite__utils() {
-  nu_run_test(test__safe_cstr,   "safe_cstr()");
-  nu_run_test(test__trim,        "trim()");
-  nu_run_test(test__strsep_trim, "strsep_trim()");
+  nu_run_test(test__safe_cstr, "safe_cstr()");
+  nu_run_test(test__trim,      "trim()");
 }
 
 #endif // TEST_UTILS_H

@@ -157,21 +157,57 @@ void test__http_request_parse() {
 }
 
 void test__http_request_add_header() {
+  HttpHeader* header = NULL;
   HttpRequest request;
   http_request_init(&request);
-  nu_not_implemented(); //TODO
+  for(size_t i=1; i<=5; ++i) {
+    header = http_request_add_header(&request);
+    nu_assert("no header object returned", header);
+    nu_assert("header not initialized", header->key == 0 && header->value == 0);
+    nu_assert("request num_headers not set properly", request.num_headers == i);
+    nu_assert("request header_cap not set properly", request.header_cap >= i);
+  }
+  http_request_free(&request);
 }
 
 void test__http_request_pop_header() {
+  HttpHeader* header = NULL;
   HttpRequest request;
   http_request_init(&request);
-  nu_not_implemented(); //TODO
+  // Add two headers
+  header = http_request_add_header(&request);
+  header = http_request_add_header(&request);
+  // Start popping
+  nu_assert("expected num_headers to be 2", request.num_headers == 2);
+  http_request_pop_header(&request);
+  nu_assert("expected num_headers to be 2", request.num_headers == 1);
+  http_request_pop_header(&request);
+  nu_assert("expected num_headers to be 2", request.num_headers == 0);
+  http_request_pop_header(&request);
+  nu_assert("expected num_headers to be 2", request.num_headers == 0);
 }
 
 void test__http_request_free() {
+  // Create a request
   HttpRequest request;
   http_request_init(&request);
-  nu_not_implemented(); //TODO
+
+  // Set the fields
+  request.version = HTTP_VERSION_1_1;
+  request.method = HTTP_METHOD_GET;
+  request.uri = strdup("http://foo.com");
+  http_request_add_header(&request);
+  request.body = strdup("this is the request body");
+
+  // Free the request and check all fields
+  http_request_free(&request);
+  nu_check("failed to initialize version", request.version == HTTP_VERSION_UNKNOWN);
+  nu_check("failed to initialize method", request.method == HTTP_METHOD_UNKNOWN);
+  nu_check("failed to initialize uri", request.uri == 0);
+  nu_check("failed to initialize num_headers", request.num_headers == 0);
+  nu_check("failed to initialize header_cap", request.header_cap == 0);
+  nu_check("failed to initialize headers", request.headers == 0);
+  nu_check("failed to initialize body", request.body == 0);
 }
 
 //==============================================================================

@@ -132,7 +132,7 @@ bool http_request_parse_request_line(HttpRequest* request, char* line) {
   char* token = NULL;
 
   // Token 1: HTTP method
-  token = strsep_trim(&line, " ");
+  token = trim(strsep(&line, " "));
   if(!token) {
     fprintf(stderr, "Error parsing HTTP header line: didn't find method (token 1)");
     return false;
@@ -144,7 +144,7 @@ bool http_request_parse_request_line(HttpRequest* request, char* line) {
   }
 
   // Token 2: URI
-  token = strsep_trim(&line, " ");
+  token = trim(strsep(&line, " "));
   if(!token) {
     fprintf(stderr, "Error parsing HTTP header line: didn't find request URI (token 2)");
     return false;
@@ -152,7 +152,7 @@ bool http_request_parse_request_line(HttpRequest* request, char* line) {
   request->uri = strdup(token);
 
   // Token 3: HTTP version
-  token = strsep_trim(&line, " ");
+  token = trim(strsep(&line, " "));
   if(!token) {
     fprintf(stderr, "Error parsing HTTP header line: didn't find HTTP version (token 3)");
     return false;
@@ -170,7 +170,7 @@ bool http_request_parse_header_line(HttpRequest* request, char* line) {
   HttpHeader* header = http_request_add_header(request);
 
   // See if we can tokenize the line. If not, bail.
-  const char* key = strsep_trim(&line, ":");
+  const char* key = trim(strsep(&line, ":"));
   if(!key) {
     fprintf(stderr, "Error parsing HTTP header line %s", line_start);
     http_request_pop_header(request);

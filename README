@@ -1,9 +1,1 @@
-My own super-simple webserver implementation, for learning. Written in C.
-
-Utilizes:
-- C
-- C socket programming
-- MinUnit (C unit-testing framework)
-- Ruby, Rake, RSpec
-- HTTP
-- libevent?
+My own simple webserver implementation, for learning. Written in C.

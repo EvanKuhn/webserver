@@ -7,6 +7,9 @@ const char* safe_cstr(const char* s) {
 }
 
 char* trim(char* str) {
+  // Check for null
+  if(!str) return NULL;
+
   // Trim trailing whitespace by adding null terminator
   const size_t len = strlen(str);
   for(size_t i=len; i>0; --i) {
@@ -15,36 +18,10 @@ char* trim(char* str) {
       break;
     }
   }
+
   // Advance 'str' to trim leading whitespace
   while(*str && isspace(*str)) {
     ++str;
   }
   return str;
-}
-
-char* strsep_trim(char** str, const char* delims) {
-  // Tokenize
-  char* token = strsep(str, delims);
-
-  //TODO - can we use trim() here??
-
-  // Trim
-  if(token) {
-    // Trim left
-    char c = *token;
-    while(c && isspace(c)) {
-      c = *(++token);
-    }
-
-    // Trim right
-    const size_t toklen = strlen(token);
-    for(size_t i=0; i<toklen; ++i) {
-      size_t index = toklen - i - 1;
-      if(!isspace(token[index])) {
-        token[index+1] = 0;
-        break;
-      }
-    }
-  }
-  return token;
 }
