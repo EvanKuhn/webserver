@@ -1,6 +1,6 @@
 SHELL   = /bin/sh
 CC      = gcc
-CFLAGS  = -c -std=c99 -Wall -Isrc -Ilib -Werror -g -Wwrite-strings
+CFLAGS  = -c -std=c99 -Wall -Isrc -Ilib/nu_unit -Werror -g -Wwrite-strings
 SOURCES = src/http_request.c src/program_options.c src/sockets.c src/status.c src/webserver.c src/utils.c
 OBJECTS = $(SOURCES:.c=.o)
 TESTS   = tests/test_http_request.h tests/test_program_options.h tests/test_sockets.h tests/test_utils.h
@@ -15,7 +15,7 @@ src/status.o: src/status.h
 src/webserver.o: src/webserver.h src/sockets.h src/http_request.h
 src/webserver_main.o: src/program_options.h src/webserver.h
 src/utils.o: src/utils.h
-tests/run_tests.o: $(SOURCES) $(TESTS) lib/nu_unit.h
+tests/run_tests.o: $(SOURCES) $(TESTS) lib//nu_unit/nu_unit.h
 
 # Executables
 bin/webserver: $(OBJECTS) src/webserver_main.o

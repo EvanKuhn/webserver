@@ -12,7 +12,7 @@
 nu_init();
 
 int main(int argc, char **argv) {
-  nu_output_level_suites();
+  nu_suite_level_output();
 
   // Run all test suites
   nu_run_suite(test_suite__http_enums,      "HTTP Enums");

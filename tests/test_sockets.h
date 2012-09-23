@@ -35,9 +35,9 @@ int get_next_port() {
 void test__client_socket_init() {
   ClientSocket s;
   client_socket_init(&s);
-  nu_assert("failed to initialize the file descriptor", s.fd == -1);
-  nu_assert("failed to initialize the data pointer", s.data == 0);
-  nu_assert("failed to initialize the data length", s.data_len == 0);
+  nu_check("failed to initialize the file descriptor", s.fd == -1);
+  nu_check("failed to initialize the data pointer", s.data == 0);
+  nu_check("failed to initialize the data length", s.data_len == 0);
 }
 
 void test__client_socket_connect() {
@@ -51,7 +51,7 @@ void test__client_socket_connect() {
 
   result = client_socket_connect(&s, "localhost", port);
   nu_assert("should fail if no server is listening", !result.ok);
-  nu_assert("should reset file descriptor on failure", s.fd == -1);
+  nu_check("should reset file descriptor on failure", s.fd == -1);
 
   // Test accepting a connection by forking a new process and starting a server
   // socket listening from the child process
@@ -251,11 +251,11 @@ void test__client_socket_close() {
 void test__server_socket_init() {
   ServerSocket s;
   Status result = server_socket_init(&s);
-  nu_assert("returned false", result.ok);
-  nu_assert("failed to set the file descriptor", s.fd != 0);
-  nu_assert("failed to set the socket address family", s.addr.sin_family == AF_INET);
-  nu_assert("failed to set the in-address", s.addr.sin_addr.s_addr == INADDR_ANY);
-  nu_assert("failed to set port to 0", s.addr.sin_port == 0);
+  nu_check("returned false", result.ok);
+  nu_check("failed to set the file descriptor", s.fd != 0);
+  nu_check("failed to set the socket address family", s.addr.sin_family == AF_INET);
+  nu_check("failed to set the in-address", s.addr.sin_addr.s_addr == INADDR_ANY);
+  nu_check("failed to set port to 0", s.addr.sin_port == 0);
   server_socket_close(&s);
 }
 
@@ -263,8 +263,8 @@ void test__server_socket_bind() {
   ServerSocket s;
   server_socket_init(&s);
   Status result = server_socket_bind(&s, 8000);
-  nu_assert("returned false", result.ok);
-  nu_assert("failed to set the port", s.addr.sin_port == htons(8000));
+  nu_check("returned false", result.ok);
+  nu_check("failed to set the port", s.addr.sin_port == htons(8000));
   server_socket_close(&s);
 }
 

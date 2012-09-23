@@ -1,0 +1,3 @@
+[submodule "lib/nu_unit"]
+	path = lib/nu_unit
+	url = https://github.com/EvanKuhn/nu_unit.git

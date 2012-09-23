@@ -26,8 +26,8 @@ void test__program_options_parse__sets_defaults() {
   char* argv[1] = { strdup("webserver") };
   bool status = program_options_parse(&options, argc, argv);
   free_strings(argv, 1);
-  nu_assert("should succeed given no args", status);
-  nu_assert("didn't set default port", options.port == 80);
+  nu_check("should succeed given no args", status);
+  nu_check("didn't set default port", options.port == 80);
 }
 
 void test__program_options_parse__parses_port() {
@@ -36,8 +36,8 @@ void test__program_options_parse__parses_port() {
   char* argv[3] = { strdup("webserver"), strdup("-p"), strdup("1234") };
   bool status = program_options_parse(&options, argc, argv);
   free_strings(argv, 3);
-  nu_assert("should succeed given a port", status);
-  nu_assert("didn't parse port", options.port == 1234);
+  nu_check("should succeed given a port", status);
+  nu_check("didn't parse port", options.port == 1234);
 }
 
 void test__program_options_parse__requires_port_arg() {
@@ -46,7 +46,7 @@ void test__program_options_parse__requires_port_arg() {
   char* argv[2] = { strdup("webserver"), strdup("-p") };
   bool status = program_options_parse(&options, argc, argv);
   free_strings(argv, 2);
-  nu_assert("should fail if not given port arg", status == false);
+  nu_check("should fail if not given port arg", status == false);
 }
 
 void test__program_options_parse__supports_help() {
@@ -55,8 +55,8 @@ void test__program_options_parse__supports_help() {
   char* argv[2] = { strdup("webserver"), strdup("-h") };
   bool status = program_options_parse(&options, argc, argv);
   free_strings(argv, 2);
-  nu_assert("should accept -h", status);
-  nu_assert("should set help flag to true", options.help);
+  nu_check("should accept -h", status);
+  nu_check("should set help flag to true", options.help);
 }
 
 //==============================================================================
