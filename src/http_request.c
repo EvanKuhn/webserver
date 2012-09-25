@@ -6,41 +6,6 @@
 #include "utils.h"
 
 //==============================================================================
-// Enums
-//==============================================================================
-enum EHttpVersion http_version_from_string(const char* str) {
-  if(!strcmp(str, "HTTP/1.0")) return HTTP_VERSION_1_0;
-  if(!strcmp(str, "HTTP/1.1")) return HTTP_VERSION_1_1;
-  return HTTP_VERSION_UNKNOWN;
-}
-
-enum EHttpMethod http_method_from_string(const char* str) {
-  if(!strcmp(str, "GET" )) return HTTP_METHOD_GET;
-  if(!strcmp(str, "HEAD")) return HTTP_METHOD_HEAD;
-  if(!strcmp(str, "POST")) return HTTP_METHOD_POST;
-  if(!strcmp(str, "PUT" )) return HTTP_METHOD_PUT;
-  return HTTP_METHOD_UNKNOWN;
-}
-
-const char* http_version_to_string(enum EHttpVersion x) {
-  switch(x) {
-    case HTTP_VERSION_1_0: return "HTTP/1.0";
-    case HTTP_VERSION_1_1: return "HTTP/1.1";
-    default:               return "?";
-  }
-}
-
-const char* http_method_to_string(enum EHttpMethod x) {
-  switch(x) {
-    case HTTP_METHOD_GET:  return "GET";
-    case HTTP_METHOD_HEAD: return "HEAD";
-    case HTTP_METHOD_POST: return "POST";
-    case HTTP_METHOD_PUT:  return "PUT";
-    default:               return "?";
-  }
-}
-
-//==============================================================================
 // HttpHeader
 //==============================================================================
 void http_header_init(HttpHeader* header) {
@@ -195,7 +160,7 @@ void http_request_parse(HttpRequest* request, char* text) {
   http_request_parse_request_line(request, curline);
 
   // Parse headers
-  while(curline) {
+  while(text) {
     // Get next line. Break if "\r\n" is reached (or in our case, "\r\0").
     curline = strsep(&text, "\n");
     if(!curline) {

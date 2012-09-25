@@ -8,33 +8,7 @@
 #define HTTP_REQUEST_H
 
 #include <sys/types.h>
-
-//==============================================================================
-// Enums
-//==============================================================================
-// HTTP versions
-enum EHttpVersion {
-  HTTP_VERSION_UNKNOWN,
-  HTTP_VERSION_1_0,
-  HTTP_VERSION_1_1
-};
-
-// HTTP methods
-enum EHttpMethod {
-  HTTP_METHOD_UNKNOWN,
-  HTTP_METHOD_GET,
-  HTTP_METHOD_HEAD,
-  HTTP_METHOD_POST,
-  HTTP_METHOD_PUT
-};
-
-// Convert from string to enum. Returns UNKNOWN enum value on error.
-enum EHttpVersion http_version_from_string(const char* s);
-enum EHttpMethod http_method_from_string(const char* s);
-
-// Convert from enum to string. Returns "?" on error.
-const char* http_version_to_string(enum EHttpVersion x);
-const char* http_method_to_string(enum EHttpMethod x);
+#include "http_enums.h"
 
 //==============================================================================
 // An HTTP header contains a key and value

@@ -1,3 +1,13 @@
+Set up Rakefile and rspec tests
+
+webserver
+- needs signal handling to properly shut down socket
+- config file reader
+- refactor StringBuffer and replace with HttpResponse (see bottom of this file)
+- allow us to set the file-storage-root at the command line
+  - use this during testing so we can set our own test pages
+- silent and/or verbose options
+
 nu_unit
 - ability to provide command-line args
   - for output level:  -l/level <t,test,s,suite>
@@ -5,17 +15,22 @@ nu_unit
   - for help:          -h, --help
 
 We will need a config file to house settings:
+- FILE_STORAGE_ROOT
 - MAX_PENDING_CONNS
 - CLIENT_SOCKET_RECV_BUFFER_SIZE
 - ...
 
 At end of tests, check for and kill all child processes
 
-Set up Rakefile and rspec tests
 
-Get webserver responding to some basic request
-- Test with 'curl'
-- Start with HEAD and GET?
 
-Add support for HTTP headers
-- need to figure out which ones to start with
+
+
+typedef struct HttpResponse HttpResponse;
+
+HttpResponse* res = http_response_new();
+http_response_set_status(res, HTTP_VERSION_1_1, HTTP_STATUS_OK);
+http_response_add_header(res, "Server", "webserver");
+http_response_add_header(res, "Content-Length", strlen(body));
+http_response_set_body(res, body);
+http_response_to_string(res);

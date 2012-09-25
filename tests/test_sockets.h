@@ -260,22 +260,24 @@ void test__server_socket_init() {
 }
 
 void test__server_socket_bind() {
+  const int port = get_next_port();
   ServerSocket s;
   server_socket_init(&s);
-  Status result = server_socket_bind(&s, 8000);
+  Status result = server_socket_bind(&s, port);
   nu_check("returned false", result.ok);
-  nu_check("failed to set the port", s.addr.sin_port == htons(8000));
+  nu_check("failed to set the port", s.addr.sin_port == htons(port));
   server_socket_close(&s);
 }
 
 void test__server_socket_listen() {
+  const int port = get_next_port();
   ServerSocket s;
   server_socket_init(&s);
 
   Status result = server_socket_listen(&s, 10);
   nu_assert("should fail with unbound socket", !result.ok);
 
-  server_socket_bind(&s, 8000);
+  server_socket_bind(&s, port);
   result = server_socket_listen(&s, 10);
   nu_assert("failed with bound socket", result.ok);
 
