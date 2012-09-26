@@ -1,9 +1,11 @@
 SHELL   = /bin/sh
 CC      = gcc
 CFLAGS  = -c -std=c99 -Wall -Isrc -Ilib/nu_unit -Werror -g -Wwrite-strings
-SOURCES = src/http_enums.c src/http_request.c src/program_options.c src/sockets.c src/status.c src/webserver.c src/utils.c
+SOURCES = src/http_enums.c src/http_request.c src/http_response.c src/program_options.c \
+					src/sockets.c src/status.c src/webserver.c src/utils.c
 OBJECTS = $(SOURCES:.c=.o)
-TESTS   = tests/test_http_enums.h tests/test_http_request.h tests/test_program_options.h tests/test_sockets.h tests/test_utils.h
+TESTS   = tests/test_http_enums.h tests/test_http_request.h tests/test_http_response.h \
+					tests/test_program_options.h tests/test_sockets.h tests/test_utils.h
 
 all: $(OBJECTS) bin/webserver bin/run_tests
 
