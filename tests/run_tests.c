@@ -14,7 +14,7 @@
 nu_init();
 
 int main(int argc, char **argv) {
-  //nu_suite_level_output();
+  nu_parse_cmdline(argc, argv);
 
   // Run all test suites
   nu_run_suite(test_suite__http_enums,      "HttpEnums");
