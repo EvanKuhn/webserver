@@ -3,7 +3,6 @@ Set up Rakefile and rspec tests
 webserver
 - needs signal handling to properly shut down socket
 - config file reader
-- refactor StringBuffer and replace with HttpResponse (see bottom of this file)
 - allow us to set the file-storage-root at the command line
   - use this during testing so we can set our own test pages
 - silent and/or verbose options
@@ -22,15 +21,4 @@ We will need a config file to house settings:
 
 At end of tests, check for and kill all child processes
 
-
-
-
-
-typedef struct HttpResponse HttpResponse;
-
-HttpResponse* res = http_response_new();
-http_response_set_status(res, HTTP_VERSION_1_1, HTTP_STATUS_OK);
-http_response_add_header(res, "Server", "webserver");
-http_response_add_header(res, "Content-Length", strlen(body));
-http_response_set_body(res, body);
-http_response_to_string(res);
+Why can't I quickly close and reopen a socket on the same port?

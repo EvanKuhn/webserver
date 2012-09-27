@@ -25,7 +25,6 @@ int main(int argc, char **argv) {
   nu_run_suite(test_suite__client_socket,   "ClientSocket");
   nu_run_suite(test_suite__server_socket,   "ServerSocket");
   nu_run_suite(test_suite__utils,           "Utils");
-  nu_run_suite(test_suite__string_buffer,   "StringBuffer");
 
   // Print results and return
   nu_print_summary();

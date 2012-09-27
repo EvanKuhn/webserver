@@ -44,6 +44,8 @@ enum EHttpMethod http_method_from_string(const char* s);
 //==============================================================================
 enum EHttpStatus {
   HTTP_STATUS_OK = 200,
+  HTTP_STATUS_NOT_FOUND = 404,
+  HTTP_STATUS_NOT_IMPLEMENTED = 501,
   //TODO - etc
   HTTP_STATUS_UNKNOWN
 };

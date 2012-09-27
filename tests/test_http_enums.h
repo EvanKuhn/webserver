@@ -79,6 +79,10 @@ void test__http_status_to_string() {
   const char* str = NULL;
   str = http_status_to_string(HTTP_STATUS_OK);
   nu_check("failed to convert HTTP_STATUS_OK to string", !strcmp(str, "OK"));
+  str = http_status_to_string(HTTP_STATUS_NOT_FOUND);
+  nu_check("failed to convert HTTP_STATUS_NOT_FOUND to string", !strcmp(str, "Not Found"));
+  str = http_status_to_string(HTTP_STATUS_NOT_IMPLEMENTED);
+  nu_check("failed to convert HTTP_STATUS_NOT_IMPLEMENTED to string", !strcmp(str, "Not Implemented"));
   str = http_status_to_string(HTTP_STATUS_UNKNOWN);
   nu_check("failed to convert HTTP_STATUS_UNKNOWN to string", !strcmp(str, "?"));
   str = http_status_to_string(HTTP_STATUS_UNKNOWN + 3);
@@ -89,6 +93,10 @@ void test__http_status_from_string() {
   enum EHttpStatus val = HTTP_STATUS_UNKNOWN;
   val = http_status_from_string("OK");
   nu_check("failed to recognize OK", val == HTTP_STATUS_OK);
+  val = http_status_from_string("Not Found");
+  nu_check("failed to recognize Not Found", val == HTTP_STATUS_NOT_FOUND);
+  val = http_status_from_string("Not Implemented");
+  nu_check("failed to recognize Not Implemented", val == HTTP_STATUS_NOT_IMPLEMENTED);
   val = http_status_from_string("AMAZING");
   nu_check("failed to return UNKNOWN for invalid status", val == HTTP_STATUS_UNKNOWN);
 }
