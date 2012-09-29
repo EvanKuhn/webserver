@@ -10,32 +10,21 @@
 #include "program_options.h"
 #include "webserver.h"
 
-const char* usage() {
-  return
-  "\n"
-  "OPTIONS:\n"
-  "  -p <port>    Set the port to listen on\n"
-  "  -h           Show this help message\n"
-  "\n"
-  ;
-}
-
 int main(int argc, char** argv) {
   // Get options
   ProgramOptions options;
   if(!program_options_parse(&options, argc, argv)) {
-    fprintf(stderr, "%s", usage());
+    fprintf(stderr, "%s", program_options_usage());
     exit(1);
   }
   if(options.help) {
-    printf("%s", usage());
+    printf("%s", program_options_usage());
     exit(0);
   }
 
   // Print options
-  printf("Options\n");
-  printf(" - port = %i\n", options.port);
+  program_options_print(&options);
 
-  // Start server
-  start_server(options.port);
+  // Start the webserver
+  webserver_start(&options.config);
 }

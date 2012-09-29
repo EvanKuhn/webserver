@@ -27,7 +27,9 @@ void test__program_options_parse__sets_defaults() {
   bool status = program_options_parse(&options, argc, argv);
   free_strings(argv, 1);
   nu_check("should succeed given no args", status);
-  nu_check("didn't set default port", options.port == 80);
+  nu_check("didn't set default port", options.config.port == 80);
+  nu_check("didn't set verbose off", !options.config.verbose);
+  nu_check("didn't set help off", !options.help);
 }
 
 void test__program_options_parse__parses_port() {
@@ -37,7 +39,7 @@ void test__program_options_parse__parses_port() {
   bool status = program_options_parse(&options, argc, argv);
   free_strings(argv, 3);
   nu_check("should succeed given a port", status);
-  nu_check("didn't parse port", options.port == 1234);
+  nu_check("didn't parse port", options.config.port == 1234);
 }
 
 void test__program_options_parse__requires_port_arg() {
@@ -47,6 +49,16 @@ void test__program_options_parse__requires_port_arg() {
   bool status = program_options_parse(&options, argc, argv);
   free_strings(argv, 2);
   nu_check("should fail if not given port arg", status == false);
+}
+
+void test__program_options_parse__parses_verbose() {
+  ProgramOptions options;
+  int argc = 2;
+  char* argv[2] = { strdup("webserver"), strdup("-v") };
+  bool status = program_options_parse(&options, argc, argv);
+  free_strings(argv, 2);
+  nu_check("should succeed given verbose flag", status);
+  nu_check("didn't parse verbose flag", options.config.verbose);
 }
 
 void test__program_options_parse__supports_help() {
@@ -68,6 +80,7 @@ void test_suite__program_options() {
   nu_run_test(test__program_options_parse__sets_defaults,     "program_options_parse() sets defaults");
   nu_run_test(test__program_options_parse__parses_port,       "program_options_parse() parses port");
   nu_run_test(test__program_options_parse__requires_port_arg, "program_options_parse() requires port arg");
+  nu_run_test(test__program_options_parse__parses_verbose,    "program_options_parse() parses verbose");
   nu_run_test(test__program_options_parse__supports_help,     "program_options_parse() supports help");
 }
 

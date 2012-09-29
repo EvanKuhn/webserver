@@ -6,6 +6,23 @@
 
 bool silence_program_options_parse = false;
 
+const char* program_options_usage() {
+  return
+  "\n"
+  "OPTIONS:\n"
+  "  -p <port>    Set the port to listen on\n"
+  "  -v           Enable verbose output\n"
+  "  -h           Show this help message\n"
+  "\n"
+  ;
+}
+
+void program_options_print(ProgramOptions* options) {
+  printf("Options\n");
+  printf(" - port:    %i\n", options->config.port);
+  printf(" - verbose: %s\n", options->config.verbose ? "yes" : "no");
+}
+
 bool program_options_parse(ProgramOptions* options, int argc, char** argv) {
   // Tell getopt() not to print error messages
   opterr = 0;
@@ -14,18 +31,21 @@ bool program_options_parse(ProgramOptions* options, int argc, char** argv) {
   optind = 1;
 
   // Set defaults
-  options->port = 80;
   options->help = false;
+  webserver_config_init(&options->config);
 
   // Parse command-line inputs
   char c = 0;
-  while((c = getopt(argc, argv, "hp:")) != -1) {
+  while((c = getopt(argc, argv, "p:vh")) != -1) {
     switch(c) {
+    case 'p':
+      options->config.port = atoi(optarg);
+      break;
+    case 'v':
+      options->config.verbose = true;
+      break;
     case 'h':
       options->help = true;
-      break;
-    case 'p':
-      options->port = atoi(optarg);
       break;
     case '?':
       if(!silence_program_options_parse) {
