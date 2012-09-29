@@ -6,6 +6,7 @@ webserver
 - allow us to set the file-storage-root at the command line
   - use this during testing so we can set our own test pages
 - silent and/or verbose options
+- add string class (see ~/dev/scratch/source/)
 
 We will need a config file to house settings:
 - FILE_STORAGE_ROOT
