@@ -7,12 +7,6 @@ webserver
   - use this during testing so we can set our own test pages
 - silent and/or verbose options
 
-nu_unit
-- ability to provide command-line args
-  - for output level:  -l/level <t,test,s,suite>
-  - to run one suite:  -s/--suite <suite>
-  - for help:          -h, --help
-
 We will need a config file to house settings:
 - FILE_STORAGE_ROOT
 - MAX_PENDING_CONNS
@@ -22,3 +16,4 @@ We will need a config file to house settings:
 At end of tests, check for and kill all child processes
 
 Why can't I quickly close and reopen a socket on the same port?
+- Need to test by opening a server socket, closing, and reopening

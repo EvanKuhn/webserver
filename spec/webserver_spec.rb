@@ -40,7 +40,13 @@ describe :webserver do
   it 'responds to GET' do
     TCPSocket.open('localhost', @current_test_port) do |s|
       s.send("GET /hello.html HTTP/1.1\r\n\r\n", 0);
-      s.read.should == "HTTP/1.1 200 OK\nContent-Length: 58\nContent-Type: text/html\n\n<html><head></head><body><p>Hello World!</p></body></html>"
+      s.read.should ==
+        "HTTP/1.0 200 OK\r\n" \
+        "Content-Length: 59\r\n" \
+        "Content-Type: text/html\r\n" \
+        "Server: webserver\r\n" \
+        "\r\n" \
+        "<html><head></head><body><p>Hello World!</p></body></html>\n"
     end
   end
 end
