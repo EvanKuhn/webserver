@@ -17,6 +17,7 @@ typedef struct ProgramOptions {
 } ProgramOptions;
 
 // Flag to tell program_options_parse not to print error messages. For testing.
+// TODO - get rid of this, write error message to ProgramOptions struct
 extern bool silence_program_options_parse;
 
 // Get the program options usage string
