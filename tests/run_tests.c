@@ -9,6 +9,7 @@
 #include "test_http_response.h"
 #include "test_program_options.h"
 #include "test_sockets.h"
+#include "test_string.h"
 #include "test_utils.h"
 
 nu_init();
@@ -24,6 +25,7 @@ int main(int argc, char **argv) {
   nu_run_suite(test_suite__program_options, "ProgramOptions");
   nu_run_suite(test_suite__client_socket,   "ClientSocket");
   nu_run_suite(test_suite__server_socket,   "ServerSocket");
+  nu_run_suite(test_suite__string,          "String");
   nu_run_suite(test_suite__utils,           "Utils");
 
   // Print results and return

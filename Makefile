@@ -2,11 +2,13 @@ SHELL   = /bin/sh
 CC      = gcc
 CFLAGS  = -c -std=c99 -Wall -Isrc -Ilib/nu_unit -Werror -g -Wwrite-strings
 SOURCES = src/http_enums.c src/http_request.c src/http_response.c src/program_options.c \
-					src/sockets.c src/status.c src/webserver.c src/webserver_config.c src/utils.c
+					src/sockets.c src/status.c src/std_string.c src/webserver.c src/webserver_config.c \
+					src/utils.c
 HEADERS = $(SOURCES:.c=.h)
 OBJECTS = $(SOURCES:.c=.o)
 TESTS   = tests/test_http_enums.h tests/test_http_request.h tests/test_http_response.h \
-					tests/test_program_options.h tests/test_sockets.h tests/test_utils.h
+					tests/test_program_options.h tests/test_sockets.h tests/test_string.h \
+					tests/test_utils.h
 
 all: $(OBJECTS) bin/webserver bin/run_tests
 
@@ -16,6 +18,7 @@ src/http_request.o: src/http_request.h src/utils.h
 src/program_options.o: src/program_options.h src/webserver_config.h
 src/sockets.o: src/sockets.h src/status.h
 src/status.o: src/status.h
+src/std_string.o: src/std_string.h
 src/webserver.o: src/webserver.h src/sockets.h src/http_request.h
 src/webserver_config.o: src/webserver_config.h
 src/webserver_main.o: src/program_options.h src/webserver.h
