@@ -145,7 +145,10 @@ void string_append_cstr(string* str, const char* cstr) {
 }
 
 void string_append_cstrn(string* str, const char* cstr, size_t len) {
+  if(len == 0) return;
   const size_t empty_space = (str->cap - str->size);
+  // Check the string for null terminators in the first 'len' chars
+  len = strnlen(cstr, len);
   // Make sure there is space in the string's buffer
   if(empty_space < len) {
     string_reserve(str, len-empty_space);
@@ -171,6 +174,7 @@ void string_ltrim(string* str) {
   for( ; i<str->size; ++i) {
     if(!isspace(str->buf[i])) break;
   }
+  if(i == 0) return;
   // Shift the string down, over the whitespace, then pad the rest with \0
   // - 'i' equals the number of whitespace characters up front
   size_t newsize = str->size - i;

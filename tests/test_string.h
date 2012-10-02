@@ -200,38 +200,144 @@ void test__string_append_cstr() {
 void test__string_append_cstrn() {
   string* s = string_new();
   // Should work when n == string length
+  string_append_cstrn(s, "abc", 3);
+  nu_check("string length should be 3", string_size(s) == 3);
+  nu_check("string should be 'abc'", string_equal_cstr(s, "abc"));
   // Should work when n < string length
+  string_append_cstrn(s, "xyz", 1);
+  nu_check("string length should be 4", string_size(s) == 4);
+  nu_check("string should be 'abcx'", string_equal_cstr(s, "abcx"));
   // Should work when n > string length
+  string_append_cstrn(s, "123", 5);
+  nu_check("string length should be 7", string_size(s) == 7);
+  nu_check("string should be 'abcx123'", string_equal_cstr(s, "abcx123"));
   string_free(s);
 }
 
 void test__string_append_str() {
   string* s = string_new();
+  string* other = string_new();
+  string_set(s, "hi");
+  // Append empty string
+  string_append_str(s, other);
+  nu_check("appending an empty string should do nothing", string_equal_cstr(s, "hi"));
+  // Append non-empty string
+  string_set(other, " there");
+  string_append_str(s, other);
+  nu_check("appending a non-empty string should work", string_equal_cstr(s, "hi there"));
   string_free(s);
+  string_free(other);
 }
 
 void test__string_trim() {
   string* s = string_new();
+  // Try with empty string
+  string_trim(s);
+  nu_check("trimming an empty string should do nothing", string_equal_cstr(s, ""));
+  // Try with string w/o spaces
+  string_set(s, "abc");
+  string_trim(s);
+  nu_check("trimming string 'abc' should do nothing", string_equal_cstr(s, "abc"));
+  // Try with string with left spaces
+  string_set(s, "  abc");
+  string_trim(s);
+  nu_check("trimming string '  abc' should yield 'abc'", string_equal_cstr(s, "abc"));
+  // Try with string with right spaces
+  string_set(s, "abc  ");
+  string_trim(s);
+  nu_check("trimming string 'abc  ' should yield 'abc'", string_equal_cstr(s, "abc"));
+  // Try with string with left and right spaces
+  string_set(s, " a b c ");
+  string_trim(s);
+  nu_check("trimming string ' a b c ' should yield 'a b c'", string_equal_cstr(s, "a b c"));
   string_free(s);
 }
 
 void test__string_ltrim() {
   string* s = string_new();
+  // Try with empty string
+  string_ltrim(s);
+  nu_check("trimming an empty string should do nothing", string_equal_cstr(s, ""));
+  // Try with string w/o spaces
+  string_set(s, "abc");
+  string_ltrim(s);
+  nu_check("trimming string 'abc' should do nothing", string_equal_cstr(s, "abc"));
+  // Try with string with left spaces
+  string_set(s, "  abc");
+  string_ltrim(s);
+  nu_check("trimming string '  abc' should yield 'abc'", string_equal_cstr(s, "abc"));
+  // Try with string with right spaces
+  string_set(s, "abc  ");
+  string_ltrim(s);
+  nu_check("trimming string 'abc  ' should do nothing", string_equal_cstr(s, "abc  "));
+  // Try with string with left and right spaces
+  string_set(s, " a b c ");
+  string_ltrim(s);
+  nu_check("trimming string ' a b c ' should yield 'a b c '", string_equal_cstr(s, "a b c "));
   string_free(s);
 }
 
 void test__string_rtrim() {
   string* s = string_new();
+  // Try with empty string
+  string_rtrim(s);
+  nu_check("trimming an empty string should do nothing", string_equal_cstr(s, ""));
+  // Try with string w/o spaces
+  string_set(s, "abc");
+  string_rtrim(s);
+  nu_check("trimming string 'abc' should do nothing", string_equal_cstr(s, "abc"));
+  // Try with string with left spaces
+  string_set(s, "  abc");
+  string_rtrim(s);
+  nu_check("trimming string '  abc' should do nothing", string_equal_cstr(s, "  abc"));
+  // Try with string with right spaces
+  string_set(s, "abc  ");
+  string_rtrim(s);
+  nu_check("trimming string 'abc  ' should yield 'abc'", string_equal_cstr(s, "abc"));
+  // Try with string with left and right spaces
+  string_set(s, " a b c ");
+  string_rtrim(s);
+  nu_check("trimming string ' a b c ' should yield 'a b c'", string_equal_cstr(s, " a b c"));
   string_free(s);
 }
 
 void test__string_upcase() {
   string* s = string_new();
+  // Try with empty string
+  string_upcase(s);
+  nu_check("shouldn't affect empty string", string_equal_cstr(s, ""));
+  // Try with string with a mix of upper and lower
+  string_set(s, "aSdF");
+  string_upcase(s);
+  nu_check("should handle mixed-case strings", string_equal_cstr(s, "ASDF"));
+  // Try with string with all lower
+  string_set(s, "asdf");
+  string_upcase(s);
+  nu_check("should handle all-lowercase strings", string_equal_cstr(s, "ASDF"));
+  // Try with string with all upper
+  string_set(s, "ASDF");
+  string_upcase(s);
+  nu_check("should handle all-uppercase strings", string_equal_cstr(s, "ASDF"));
   string_free(s);
 }
 
 void test__string_downcase() {
   string* s = string_new();
+  // Try with empty string
+  string_downcase(s);
+  nu_check("shouldn't affect empty string", string_equal_cstr(s, ""));
+  // Try with string with a mix of upper and lower
+  string_set(s, "aSdF");
+  string_downcase(s);
+  nu_check("should handle mixed-case strings", string_equal_cstr(s, "asdf"));
+  // Try with string with all lower
+  string_set(s, "asdf");
+  string_downcase(s);
+  nu_check("should handle all-lowercase strings", string_equal_cstr(s, "asdf"));
+  // Try with string with all upper
+  string_set(s, "ASDF");
+  string_downcase(s);
+  nu_check("should handle all-uppercase strings", string_equal_cstr(s, "asdf"));
   string_free(s);
 }
 
@@ -239,28 +345,24 @@ void test__string_downcase() {
 // Test suites
 //==============================================================================
 void test_suite__string() {
-  nu_run_test(test__string_new, "string_new()");
-  nu_run_test(test__string_set, "string_set()");
-  nu_run_test(test__string_clear, "string_clear()");
-  nu_run_test(test__string_release, "string_release()");
-  nu_run_test(test__string_reserve, "string_reserve()");
-  nu_run_test(test__string_resize, "string_resize()");
-  nu_run_test(test__string_empty, "string_empty()");
-  nu_run_test(test__string_equal, "string_equal()");
-  nu_run_test(test__string_equal_cstr, "string_equal_cstr()");
-  nu_run_test(test__string_append_char, "string_append_char()");
-  nu_run_test(test__string_append_cstr, "string_append_cstr()");
-
-
+  nu_run_test(test__string_new,          "string_new()");
+  nu_run_test(test__string_set,          "string_set()");
+  nu_run_test(test__string_clear,        "string_clear()");
+  nu_run_test(test__string_release,      "string_release()");
+  nu_run_test(test__string_reserve,      "string_reserve()");
+  nu_run_test(test__string_resize,       "string_resize()");
+  nu_run_test(test__string_empty,        "string_empty()");
+  nu_run_test(test__string_equal,        "string_equal()");
+  nu_run_test(test__string_equal_cstr,   "string_equal_cstr()");
+  nu_run_test(test__string_append_char,  "string_append_char()");
+  nu_run_test(test__string_append_cstr,  "string_append_cstr()");
   nu_run_test(test__string_append_cstrn, "string_append_cstrn()");
-  nu_run_test(test__string_append_str, "string_append_str()");
-
-  nu_run_test(test__string_trim, "string_trim()");
-  nu_run_test(test__string_ltrim, "string_ltrim()");
-  nu_run_test(test__string_rtrim, "string_rtrim()");
-
-  nu_run_test(test__string_upcase, "string_upcase()");
-  nu_run_test(test__string_downcase, "string_downcase()");
+  nu_run_test(test__string_append_str,   "string_append_str()");
+  nu_run_test(test__string_trim,         "string_trim()");
+  nu_run_test(test__string_ltrim,        "string_ltrim()");
+  nu_run_test(test__string_rtrim,        "string_rtrim()");
+  nu_run_test(test__string_upcase,       "string_upcase()");
+  nu_run_test(test__string_downcase,     "string_downcase()");
 }
 
 #endif // TEST_STRNG_H
