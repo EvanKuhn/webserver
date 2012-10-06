@@ -51,9 +51,14 @@ void http_request_init(HttpRequest* request) {
 }
 
 void http_request_free(HttpRequest* request) {
-  if(request->uri)     free(request->uri);
-  if(request->headers) free(request->headers);
-  if(request->body)    free(request->body);
+  if(request->headers) {
+    for(size_t i=0; i<request->num_headers; ++i) {
+      http_header_free(&request->headers[i]);
+    }
+    free(request->headers);
+  }
+  if(request->uri)  free(request->uri);
+  if(request->body) free(request->body);
   http_request_init(request);
 }
 
@@ -151,18 +156,22 @@ bool http_request_parse_header_line(HttpRequest* request, char* line) {
   return true;
 }
 
-void http_request_parse(HttpRequest* request, char* text) {
+void http_request_parse(HttpRequest* request, const char* text) {
   // Clear any existing data and reset the object
   http_request_free(request);
 
+  // Copy the text
+  char* textcopy = strdup(text);
+  char* textcopy_start = textcopy;
+
   // Parse the HTTP request line (the first line): HTTP method, URI, version
-  char* curline = strsep(&text, "\n");
+  char* curline = strsep(&textcopy, "\n");
   http_request_parse_request_line(request, curline);
 
   // Parse headers
-  while(text) {
+  while(textcopy) {
     // Get next line. Break if "\r\n" is reached (or in our case, "\r\0").
-    curline = strsep(&text, "\n");
+    curline = strsep(&textcopy, "\n");
     if(!curline) {
       fprintf(stderr, "Unexpected end of text while parsing HTTP request\n");
       break;
@@ -180,11 +189,15 @@ void http_request_parse(HttpRequest* request, char* text) {
   }
 
   // Store the remaining text as the body
-  if(text) {
-    const size_t textlen = strlen(text);
+  if(textcopy && textcopy[0]) {
+    const size_t textlen = strlen(textcopy);
     request->body = malloc(textlen + 1);
-    memcpy(request->body, text, textlen + 1);
+    memcpy(request->body, textcopy, textlen + 1);
+    request->body[textlen] = 0;
   }
+
+  // Clean up our copy of the text
+  free(textcopy_start);
 }
 
 void http_request_print(HttpRequest* request) {

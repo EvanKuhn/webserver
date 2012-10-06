@@ -61,6 +61,16 @@ void test__program_options_parse__parses_verbose() {
   nu_check("didn't parse verbose flag", options.config.verbose);
 }
 
+void test__program_options_parse__parses_echo() {
+  ProgramOptions options;
+  int argc = 2;
+  char* argv[2] = { strdup("webserver"), strdup("-e") };
+  bool status = program_options_parse(&options, argc, argv);
+  free_strings(argv, 2);
+  nu_check("should succeed given echo flag", status);
+  nu_check("didn't parse echo flag", options.config.echo);
+}
+
 void test__program_options_parse__supports_help() {
   ProgramOptions options;
   int argc = 2;
@@ -81,6 +91,7 @@ void test_suite__program_options() {
   nu_run_test(test__program_options_parse__parses_port,       "program_options_parse() parses port");
   nu_run_test(test__program_options_parse__requires_port_arg, "program_options_parse() requires port arg");
   nu_run_test(test__program_options_parse__parses_verbose,    "program_options_parse() parses verbose");
+  nu_run_test(test__program_options_parse__parses_echo,       "program_options_parse() parses echo");
   nu_run_test(test__program_options_parse__supports_help,     "program_options_parse() supports help");
 }
 

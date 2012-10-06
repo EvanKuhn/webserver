@@ -46,7 +46,7 @@ void http_request_free(HttpRequest* request);
 
 // Parse the request and populated the struct's fields
 // - Will modify the input string
-void http_request_parse(HttpRequest* request, char* text);
+void http_request_parse(HttpRequest* request, const char* text);
 
 // Add or remove a header. Acts on the end of the headers array.
 // - You probably won't need to use these. They're mainly for internal use.

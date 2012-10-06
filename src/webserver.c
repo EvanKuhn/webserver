@@ -38,13 +38,19 @@ if(!status.ok) { \
 // Webserver request-handling functions
 //==============================================================================
 // This function routes the request to the proper function below
-void webserver_process_request(HttpRequest* request, ClientSocket* client);
+void webserver_process_request(HttpRequest* request, ClientSocket* client,
+                               WebServerConfig* config);
+
+// Handle different HTTP methods, or a bad request
 void webserver_process_get    (HttpRequest* request, ClientSocket* client);
 void webserver_process_head   (HttpRequest* request, ClientSocket* client);
 void webserver_process_post   (HttpRequest* request, ClientSocket* client);
 void webserver_process_put    (HttpRequest* request, ClientSocket* client);
 void webserver_process_delete (HttpRequest* request, ClientSocket* client);
 void webserver_process_error  (HttpRequest* request, ClientSocket* client);
+
+// Echo the request data back to the client. Useful for development/debugging.
+void webserver_echo_request   (HttpRequest* request, ClientSocket* client);
 
 //==============================================================================
 // Webserver
@@ -92,25 +98,26 @@ void webserver_start(WebServerConfig* config) {
       fprintf(stderr, "Got no data from client\n");
     }
 
-    // TODO - debugging output
-    printf("------------ received ------------\n");
-    printf("%s\n", client.data);
-    printf("----------------------------------\n");
+    // Print the entire request if verbose mode enabled
+    if(config->verbose) {
+      printf("------------ received ------------\n");
+      printf("%s\n", client.data);
+      printf("----------------------------------\n");
+    }
 
     // Parse the request
     HttpRequest request;
     http_request_init(&request);
     http_request_parse(&request, client.data);
-    http_request_print(&request); //TODO
 
     // Process the request and send a response
-    webserver_process_request(&request, &client);
+    webserver_process_request(&request, &client, config);
 
     // Clean up
     http_request_free(&request);
     client_socket_close(&client);
 
-    break; // TODO - for now, just handle one request
+    //break; // TODO - for now, just handle one request
   }
 
   // Close the server socket
@@ -122,13 +129,22 @@ void webserver_start(WebServerConfig* config) {
 //   TODO - reuse shared memory location for writing responses
 //   TODO - move to a different file?
 //==============================================================================
-void webserver_process_request(HttpRequest* request, ClientSocket* client) {
-  switch(request->method) {
-    case HTTP_METHOD_GET:  webserver_process_get  (request, client); break;
-    case HTTP_METHOD_HEAD: webserver_process_head (request, client); break;
-    case HTTP_METHOD_POST: webserver_process_post (request, client); break;
-    case HTTP_METHOD_PUT:  webserver_process_put  (request, client); break;
-    default:               webserver_process_error(request, client); break;
+void webserver_process_request(HttpRequest* request, ClientSocket* client,
+                               WebServerConfig* config)
+{
+  // If in echo mode, echo the request info back to the user
+  if(config->echo) {
+    webserver_echo_request(request, client);
+  }
+  // Otherwise, respond normally
+  else {
+    switch(request->method) {
+      case HTTP_METHOD_GET:  webserver_process_get  (request, client); break;
+      case HTTP_METHOD_HEAD: webserver_process_head (request, client); break;
+      case HTTP_METHOD_POST: webserver_process_post (request, client); break;
+      case HTTP_METHOD_PUT:  webserver_process_put  (request, client); break;
+      default:               webserver_process_error(request, client); break;
+    }
   }
 }
 
@@ -207,6 +223,25 @@ void webserver_process_error(HttpRequest* request, ClientSocket* client) {
   HttpResponse* res = http_response_new();
   http_response_set_status(res, HTTP_VERSION_1_0, HTTP_STATUS_NOT_IMPLEMENTED);
   http_response_add_header(res, "Server", "webserver");
+  client_socket_send(client, http_response_string(res), http_response_length(res));
+  http_response_free(res);
+}
+
+void webserver_echo_request(HttpRequest* request, ClientSocket* client) {
+  // Build the response body
+  char bodylen[20];
+  bzero(bodylen, 20);
+  snprintf(bodylen, 20, "%zu", strlen(client->data));
+
+  // Build the response object
+  HttpResponse* res = http_response_new();
+  http_response_set_status(res, HTTP_VERSION_1_0, HTTP_STATUS_OK);
+  http_response_add_header(res, "Server", "webserver");
+  http_response_add_header(res, "Content-Length", bodylen);
+  http_response_add_header(res, "Content-Type", "text/plain");
+  http_response_set_body(res, client->data);
+
+  // Send the response and clean up
   client_socket_send(client, http_response_string(res), http_response_length(res));
   http_response_free(res);
 }

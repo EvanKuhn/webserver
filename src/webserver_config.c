@@ -3,6 +3,7 @@
 void webserver_config_init(WebServerConfig* conf) {
   conf->port = 80;
   conf->verbose = false;
+  conf->echo = false;
 }
 
 // TODO - we need a 3-step process to get configuration data:

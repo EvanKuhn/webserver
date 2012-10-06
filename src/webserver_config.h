@@ -9,8 +9,9 @@
 #include <stdbool.h>
 
 typedef struct WebServerConfig {
-  int port;
-  bool verbose;
+  int  port;        // Port to listen on
+  bool verbose;     // Enable verbose output
+  bool echo;        // Echo the response back, for debugging
 } WebServerConfig;
 
 // Initialize the config object by setting defaults

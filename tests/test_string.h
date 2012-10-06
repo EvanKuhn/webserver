@@ -24,22 +24,21 @@ void test__string_new() {
 
 void test__string_set() {
   string* s = string_new();
-
+  // Set an initial string value
   string_set(s, "abc");
   nu_check("string size should be 3", string_size(s) == 3);
   nu_check("string capacity should be >= 3", string_capacity(s) >= 3);
   nu_check("string should be 'abc'", !strcmp(string_cstr(s), "abc"));
-
+  // Set a larger string so it'll have to reallocate memory
   string_set(s, "0123456789");
   nu_check("string size should be 10", string_size(s) == 10);
   nu_check("string capacity should be >= 10", string_capacity(s) >= 10);
   nu_check("string should be '0123456789'", !strcmp(string_cstr(s), "0123456789"));
-
+  // Set a smaller string. Capacity should not decrease.
   string_set(s, "x");
   nu_check("string size should be 1", string_size(s) == 1);
   nu_check("string capacity should be >= 10", string_capacity(s) >= 10);
   nu_check("string should be 'x'", !strcmp(string_cstr(s), "x"));
-
   string_free(s);
 }
 
