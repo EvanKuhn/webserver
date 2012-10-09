@@ -1,3 +1,5 @@
+Better logging output: timestamp, http method/path, from ip/port.
+- Eg: 20120912-15:23:49 221.23.59.30:45350 GET /foo/bar
 
 Socket shutdown
 - Needs signal handling to properly shut down socket
@@ -15,9 +17,6 @@ Configuration
   - CLIENT_SOCKET_RECV_BUFFER_SIZE
 - Need ConfigFile class
 - Override file-storage-root at command line so we can use our own test pages
-
-General
-- Silent and/or verbose options
 
 Testing
 - At end of tests, check for and kill all child processes

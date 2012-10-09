@@ -2,6 +2,7 @@
 #include "http_request.h"
 #include "http_response.h"
 #include "sockets.h"
+#include "logging.h"
 #include "utils.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -20,18 +21,11 @@ const int MAX_PENDING_CONNS = 100;
 // Path to the files to serve   //TODO - make this configurable!
 const char* FILE_STORAGE_ROOT = "/Users/evan/dev/webserver/sites";
 
-// Check status. On error, print message and return from calling function.
+// Check status. On error, print mesage and return from calling function.
 #define return_on_error(status, errmsg) \
 if(!status.ok) { \
-  fprintf(stderr, "%s (errno: %i)\n", errmsg, status.errnum); \
+  errlog("%s (errno: %i)", errmsg, status.errnum); \
   return; \
-}
-
-// Check status. On error, print message and continue calling loop.
-#define continue_on_error(status, errmsg) \
-if(!status.ok) { \
-  fprintf(stderr, "%s (errno: %i)\n", errmsg, status.errnum); \
-  continue; \
 }
 
 //==============================================================================
@@ -58,7 +52,10 @@ void webserver_echo_request   (HttpRequest* request, ClientSocket* client);
 void webserver_start(WebServerConfig* config) {
   printf("Initializing webserver\n");
   const int port = config->port;
-  //const bool verbose = config->verbose;
+
+  // Make sure we can open the log files
+  echo_log_to_console(true);
+  if(!open_log_files().ok) return;
 
   // Create and initialize the socket
   ServerSocket server;
@@ -73,7 +70,7 @@ void webserver_start(WebServerConfig* config) {
   status = server_socket_listen(&server, MAX_PENDING_CONNS);
   return_on_error(status, "Error having socket listen for incoming connections");
 
-  printf("Server now listening for incoming connections on port %i\n", port);
+  stdlog("Server now listening for incoming connections on port %i", port);
 
   // Accept incoming connections and service their requests
   while(1) {
@@ -82,20 +79,26 @@ void webserver_start(WebServerConfig* config) {
 
     // Accept the next connection. On failure, try again.
     status = server_socket_accept(&server, &client);
-    continue_on_error(status, "Error accepting incoming connection");
+    if(!status.ok) {
+      errlog("Error accepting incoming connection (errno: %i)", status.errnum);
+      continue;
+    }
 
     // Where is the connection coming from?
-    printf("Accepted client connection from %s:%i\n",
-           client_socket_get_ip(&client),
-           client_socket_get_port(&client));
+    const char* ip = client_socket_get_ip(&client);
+    const int port = client_socket_get_port(&client);
 
     // Read the incoming data
     status = client_socket_recv(&client);
-    continue_on_error(status, "Error reading data from client");
+    if(!status.ok) {
+      errlog("%s:%i | Error reading data from client (errno: %i)", ip, port, status.errnum);
+      continue;
+    }
 
     // Check if data received. If not, log an error.
     if(!client.data) {
-      fprintf(stderr, "Got no data from client\n");
+      errlog("%s:%i | Got no data from client", ip, port);
+      continue;
     }
 
     // Print the entire request if verbose mode enabled
@@ -110,6 +113,11 @@ void webserver_start(WebServerConfig* config) {
     http_request_init(&request);
     http_request_parse(&request, client.data);
 
+    // Log what we got
+    const char* method = http_method_to_string(request.method);
+    const char* version = http_version_to_string(request.version);
+    stdlog("%s:%i | %s %s %s", ip, port, method, request.uri,version);
+
     // Process the request and send a response
     webserver_process_request(&request, &client, config);
 
@@ -120,8 +128,9 @@ void webserver_start(WebServerConfig* config) {
     //break; // TODO - for now, just handle one request
   }
 
-  // Close the server socket
+  // Clean up
   server_socket_close(&server);
+  close_log_files();
 }
 
 //==============================================================================

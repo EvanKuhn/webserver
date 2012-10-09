@@ -1,7 +1,8 @@
 #include "utils.h"
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
+#include <time.h>
 
 const char* safe_cstr(const char* s) {
   return (s ? s : "");
@@ -25,4 +26,12 @@ char* trim(char* str) {
     ++str;
   }
   return str;
+}
+
+const char* timestamp(timebuf_t buffer) {
+  time_t rawtime;
+  time(&rawtime);
+  struct tm* timeinfo = gmtime(&rawtime);
+  strftime(buffer, 22, "%Y%m%d-%H:%M:%S UTC", timeinfo);
+  return buffer;
 }
