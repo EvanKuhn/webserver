@@ -10,22 +10,44 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <unistd.h>
 
 //==============================================================================
 // Constants and utilities
 //==============================================================================
 // Max number of incoming connections that may be queued by the server's socket
-const int MAX_PENDING_CONNS = 100;
+static const int MAX_PENDING_CONNS = 100;
 
 // Path to the files to serve   //TODO - make this configurable!
-const char* FILE_STORAGE_ROOT = "/Users/evan/dev/webserver/sites";
+//static const char* FILE_STORAGE_ROOT = "/Users/evan/dev/webserver/sites";
 
 // Check status. On error, print mesage and return from calling function.
 #define return_on_error(status, errmsg) \
 if(!status.ok) { \
   errlog("%s (errno: %i)", errmsg, status.errnum); \
   return; \
+}
+
+//==============================================================================
+// Signal handling
+//==============================================================================
+// Objects for the signal handler to manipulate
+static bool keep_running = true;
+static ClientSocket* curr_client_socket = NULL;
+static ServerSocket* curr_server_socket = NULL;
+
+// Upon receipt of a signal, close sockets and have the webserver stop running
+void handle_signal(int sig) {
+  keep_running = false;
+  stdlog("Received signal %i. Shutting down.\n", sig);
+  errlog("Received signal %i. Shutting down.\n", sig);
+  if(curr_client_socket) {
+    client_socket_close(curr_client_socket);
+  }
+  if(curr_server_socket) {
+    server_socket_close(curr_server_socket);
+  }
 }
 
 //==============================================================================
@@ -50,17 +72,27 @@ void webserver_echo_request   (HttpRequest* request, ClientSocket* client);
 // Webserver
 //==============================================================================
 void webserver_start(WebServerConfig* config) {
-  printf("Initializing webserver\n");
   const int port = config->port;
+  stdlog("Initializing server on port %i", port);
+  errlog("Initializing server on port %i", port);
+
+  // Set up signal handler
+  signal(SIGINT,  handle_signal);
+  signal(SIGKILL, handle_signal);
+  signal(SIGTERM, handle_signal);
 
   // Make sure we can open the log files
   echo_log_to_console(true);
   if(!open_log_files().ok) return;
 
   // Create and initialize the socket
-  ServerSocket server;
   Status status;
+  ServerSocket server;
 
+  // Set the current server socket so the signal handler can close the socket
+  curr_server_socket = &server;
+
+  // Initialize the server socket and start listening for incoming connections
   status = server_socket_init(&server);
   return_on_error(status, "Error initializing server socket");
 
@@ -73,9 +105,11 @@ void webserver_start(WebServerConfig* config) {
   stdlog("Server now listening for incoming connections on port %i", port);
 
   // Accept incoming connections and service their requests
-  while(1) {
+  while(keep_running) {
+    // Create the client socket save it so the signal handler can close it
     ClientSocket client;
     client_socket_init(&client);
+    curr_client_socket = &client;
 
     // Accept the next connection. On failure, try again.
     status = server_socket_accept(&server, &client);
@@ -122,6 +156,7 @@ void webserver_start(WebServerConfig* config) {
     webserver_process_request(&request, &client, config);
 
     // Clean up
+    curr_client_socket = NULL;
     http_request_free(&request);
     client_socket_close(&client);
 
@@ -129,6 +164,7 @@ void webserver_start(WebServerConfig* config) {
   }
 
   // Clean up
+  curr_server_socket = NULL;
   server_socket_close(&server);
   close_log_files();
 }
