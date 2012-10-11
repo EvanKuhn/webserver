@@ -7,6 +7,7 @@
 #ifndef HTTP_REQUEST_H
 #define HTTP_REQUEST_H
 
+#include <stdbool.h>
 #include <sys/types.h>
 #include "http_enums.h"
 
@@ -37,6 +38,7 @@ typedef struct HttpRequest {
   size_t            header_cap;   // Header array capacity
   HttpHeader*       headers;      // Array of headers
   char*             body;         // Request body
+  char*             error;        // Error message set by some functions
 } HttpRequest;
 
 // Initialize or free the struct's fields
@@ -46,7 +48,9 @@ void http_request_free(HttpRequest* request);
 
 // Parse the request and populated the struct's fields
 // - Will modify the input string
-void http_request_parse(HttpRequest* request, const char* text);
+// - Returns true on success and false on failure
+// - On failure, it will set the HttpRequest::error buffer
+bool http_request_parse(HttpRequest* request, const char* text);
 
 // Add or remove a header. Acts on the end of the headers array.
 // - You probably won't need to use these. They're mainly for internal use.

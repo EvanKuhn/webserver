@@ -47,6 +47,7 @@ enum EHttpMethod http_method_from_string(const char* str) {
 const char* http_status_to_string(enum EHttpStatus x) {
   switch(x) {
     case HTTP_STATUS_OK:              return "OK";
+    case HTTP_STATUS_BAD_REQUEST:     return "Bad Request";
     case HTTP_STATUS_NOT_FOUND:       return "Not Found";
     case HTTP_STATUS_NOT_IMPLEMENTED: return "Not Implemented";
     default:                          return "?";
@@ -55,6 +56,7 @@ const char* http_status_to_string(enum EHttpStatus x) {
 
 enum EHttpStatus http_status_from_string(const char* str) {
   if(!strcmp(str, "OK"))              return HTTP_STATUS_OK;
+  if(!strcmp(str, "Bad Request"))     return HTTP_STATUS_BAD_REQUEST;
   if(!strcmp(str, "Not Found"))       return HTTP_STATUS_NOT_FOUND;
   if(!strcmp(str, "Not Implemented")) return HTTP_STATUS_NOT_IMPLEMENTED;
   return HTTP_STATUS_UNKNOWN;

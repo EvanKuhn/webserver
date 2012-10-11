@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "utils.h"
 
 //==============================================================================
@@ -38,6 +39,29 @@ void http_header_set_value(HttpHeader* header, const char* value) {
 }
 
 //==============================================================================
+// HttpRequest: private utility functions
+//==============================================================================
+// Size of HttpRequest::error string buffer
+#define HTTP_REQUEST_ERROR_BUFLEN 256
+
+// Set the error message
+void set_error_message(HttpRequest* request, const char* format, ...) {
+  if(!request->error) request->error = malloc(HTTP_REQUEST_ERROR_BUFLEN);
+  va_list args;
+  va_start(args, format);
+  vsnprintf(request->error, HTTP_REQUEST_ERROR_BUFLEN, format, args);
+  va_end(args);
+}
+
+// Clear the error message
+void clear_error_message(HttpRequest* request) {
+  if(!request->error) {
+    free(request->error);
+    request->error = NULL;
+  }
+}
+
+//==============================================================================
 // HttpRequest
 //==============================================================================
 void http_request_init(HttpRequest* request) {
@@ -48,6 +72,7 @@ void http_request_init(HttpRequest* request) {
   request->header_cap = 0;
   request->headers = 0;
   request->body = 0;
+  request->error = 0;
 }
 
 void http_request_free(HttpRequest* request) {
@@ -57,8 +82,9 @@ void http_request_free(HttpRequest* request) {
     }
     free(request->headers);
   }
-  if(request->uri)  free(request->uri);
+  if(request->uri) free(request->uri);
   if(request->body) free(request->body);
+  if(request->error) free(request->error);
   http_request_init(request);
 }
 
@@ -104,19 +130,19 @@ bool http_request_parse_request_line(HttpRequest* request, char* line) {
   // Token 1: HTTP method
   token = trim(strsep(&line, " "));
   if(!token) {
-    fprintf(stderr, "Error parsing HTTP header line: didn't find method (token 1)");
+    set_error_message(request, "Error parsing HTTP header line: didn't find method (token 1)");
     return false;
   }
   request->method = http_method_from_string(token);
   if(request->method == HTTP_METHOD_UNKNOWN) {
-    fprintf(stderr, "Error parsing HTTP header line: unknown method \"%s\"\n", token);
+    set_error_message(request, "Error parsing HTTP header line: unknown method \"%s\"\n", token);
     return false;
   }
 
   // Token 2: URI
   token = trim(strsep(&line, " "));
   if(!token) {
-    fprintf(stderr, "Error parsing HTTP header line: didn't find request URI (token 2)");
+    set_error_message(request, "Error parsing HTTP header line: didn't find request URI (token 2)");
     return false;
   }
   request->uri = strdup(token);
@@ -124,12 +150,12 @@ bool http_request_parse_request_line(HttpRequest* request, char* line) {
   // Token 3: HTTP version
   token = trim(strsep(&line, " "));
   if(!token) {
-    fprintf(stderr, "Error parsing HTTP header line: didn't find HTTP version (token 3)");
+    set_error_message(request, "Error parsing HTTP header line: didn't find HTTP version (token 3)");
     return false;
   }
   request->version = http_version_from_string(token);
   if(request->method == HTTP_VERSION_UNKNOWN) {
-    fprintf(stderr, "Unrecognized HTTP version \"%s\"\n", token);
+    set_error_message(request, "Unrecognized HTTP version \"%s\"\n", token);
     return false;
   }
   return true;
@@ -142,7 +168,7 @@ bool http_request_parse_header_line(HttpRequest* request, char* line) {
   // See if we can tokenize the line. If not, bail.
   const char* key = trim(strsep(&line, ":"));
   if(!key) {
-    fprintf(stderr, "Error parsing HTTP header line %s", line_start);
+    set_error_message(request, "Error parsing HTTP header line %s", line_start);
     http_request_pop_header(request);
     return false;
   }
@@ -156,7 +182,10 @@ bool http_request_parse_header_line(HttpRequest* request, char* line) {
   return true;
 }
 
-void http_request_parse(HttpRequest* request, const char* text) {
+bool http_request_parse(HttpRequest* request, const char* text) {
+  // Clear the error buffer. If set during this function, there was an error.
+  clear_error_message(request);
+
   // Clear any existing data and reset the object
   http_request_free(request);
 
@@ -173,7 +202,7 @@ void http_request_parse(HttpRequest* request, const char* text) {
     // Get next line. Break if "\r\n" is reached (or in our case, "\r\0").
     curline = strsep(&textcopy, "\n");
     if(!curline) {
-      fprintf(stderr, "Unexpected end of text while parsing HTTP request\n");
+      set_error_message(request, "Unexpected end of text while parsing HTTP request\n");
       break;
     }
     if(curline[0] == '\r' && curline[1] == '\0') {
@@ -183,7 +212,7 @@ void http_request_parse(HttpRequest* request, const char* text) {
     // Store header key and value
     char* curline_orig = curline;
     if(!http_request_parse_header_line(request, curline)) {
-      fprintf(stderr, "Error parsing HTTP header line %s", curline_orig);
+      set_error_message(request, "Error parsing HTTP header line %s", curline_orig);
       continue;
     }
   }
@@ -198,6 +227,9 @@ void http_request_parse(HttpRequest* request, const char* text) {
 
   // Clean up our copy of the text
   free(textcopy_start);
+
+  // Return success if there was no error
+  return !request->error;
 }
 
 void http_request_print(HttpRequest* request) {

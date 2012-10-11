@@ -2,12 +2,17 @@
 // Logging functions. Log messages are written to either a 'standard' or 'error'
 // log file.
 //
+// - All non-error messages are written to the standard log.
+// - All error messages are written to the error log.
+// - Webserver start and stop messages are written to both logs.
+//
 // Evan Kuhn, 2012-10-08
 //==============================================================================
 #ifndef LOGGING_H
 #define LOGGING_H
 
 #include "status.h"
+#include <stdio.h>
 
 // Tell the logging system to echo log messages to the console.
 // - Messages will still be written to the log files.
@@ -24,8 +29,10 @@ Status open_log_files();
 // Close log files. Ignores errors.
 void close_log_files();
 
-// Log to the 'standard' or 'error' log file
-void stdlog(const char* format, ...);
-void errlog(const char* format, ...);
+// Logging functions
+// - If echo-to-console is enabled, these will also log to stdout or stderr
+void log_std(const char* format, ...);  // Log to stdout and 'standard' file
+void log_err(const char* format, ...);  // Log to stderr and 'error' file
+void log_all(const char* format, ...);  // Log to stdout and both files
 
 #endif // LOGGING_H
