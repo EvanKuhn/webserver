@@ -9,8 +9,9 @@ OBJECTS = $(SOURCES:.c=.o)
 TESTS   = tests/test_http_enums.h tests/test_http_request.h tests/test_http_response.h \
 					tests/test_program_options.h tests/test_sockets.h tests/test_string.h \
 					tests/test_utils.h
+MKDIRS  = mkdir -p bin/
 
-all: $(OBJECTS) bin/webserver bin/run_tests
+all: submodules $(OBJECTS) bin/webserver bin/run_tests
 
 # Object file dependencies
 src/http_enums.o: src/http_enums.h
@@ -26,16 +27,21 @@ src/webserver_main.o: src/program_options.h src/webserver.h
 src/utils.o: src/utils.h
 tests/run_tests.o: $(HEADERS) $(SOURCES) $(TESTS) lib/nu_unit/nu_unit.h
 
+submodules:
+	git submodule init
+	git submodule update
+
 # Executables
 bin/webserver: $(OBJECTS) src/webserver_main.o
 	#
 	#===== Building bin/webserver =====
+	$(MKDIRS)
 	$(CC) $(OBJECTS) src/webserver_main.o -o bin/webserver
 
 bin/run_tests: $(OBJECTS) tests/run_tests.o
 	#
 	#===== Building bin/run_tests =====
-	[ -e bin ] || mkdir bin
+	$(MKDIRS)
 	$(CC) $(OBJECTS) tests/run_tests.o -o bin/run_tests
 
 # Cleaning
